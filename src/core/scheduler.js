@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
 import { Address } from "./postoffice.js"
-import { Message } from "./message.js"
+import { Msg } from "./msg.js"
 
 export class ActorService {
     constructor(scheduler, actor) {
@@ -10,7 +10,7 @@ export class ActorService {
     }
 
     send(to, messagebody) {
-        this.scheduler.deliver(new Message(this.actor.address, to, messagebody))
+        this.scheduler.deliver(new Msg(this.actor.address, to, messagebody))
     }
 }
 

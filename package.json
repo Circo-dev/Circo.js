@@ -1,0 +1,36 @@
+{
+  "name": "circocore",
+  "version": "1.0.0",
+  "description": "An actor model",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "npx pika-web --clean --optimize"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tisztamo/CircoCore.js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tisztamo/CircoCore.js/issues"
+  },
+  "homepage": "https://github.com/tisztamo/CircoCore.js#readme",
+  "devDependencies": {
+    "@pika/web": "^0.6.1"
+  },
+  "dependencies": {
+    "three": "^0.115.0"
+  },
+  "@pika/web": {
+    "webDependencies": [
+      "three/build/three.module.js",
+      "three/examples/jsm/controls/OrbitControls.js"
+    ]
+  }
+}

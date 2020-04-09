@@ -16,3 +16,18 @@ export class Address {
         this.box = typeof box !== "undefined" ? box : Address.generateId()
     }
 }
+
+export class PostOffice {
+    constructor(url) {
+        this.url = url
+        this.socket = new WebSocket(url)
+    }
+
+    shutdown() {
+        try {
+            this.socket.close()
+        } catch (e) {
+            console.log("Exception while closing websocket", e)
+        }
+    }
+}
