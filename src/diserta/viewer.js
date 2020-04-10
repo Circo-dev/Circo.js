@@ -1,11 +1,12 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+
 import * as THREE from '../../web_modules/three/build/three.module.js';
 import { OrbitControls } from "../../web_modules/three/examples/jsm/controls/OrbitControls.js"
 
-var container, stats, controls;
-var camera, scene, raycaster, renderer;
+let container, controls;
+let camera, scene, raycaster, renderer;
 
-var mouse = new THREE.Vector2(), intersected;
-var radius = 100, theta = 0;
+let mouse = new THREE.Vector2(), intersected;
 
 init();
 animate();
@@ -20,15 +21,14 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf0f0f0);
 
-    var light = new THREE.DirectionalLight(0xffffff, 1);
+    const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(1, 1, 1).normalize();
     scene.add(light);
 
-    var geometry = new THREE.BoxBufferGeometry(20, 20, 20);
+    const geometry = new THREE.BoxBufferGeometry(20, 20, 20);
 
-    for (var i = 0; i < 2000; i++) {
-
-        var object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff }));
+    for (let i = 0; i < 2000; i++) {
+        const object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff }));
 
         object.position.x = Math.random() * 800 - 400;
         object.position.y = Math.random() * 800 - 400;
@@ -53,19 +53,19 @@ function init() {
     container.appendChild(renderer.domElement);
 
     createControls(camera);
-    document.addEventListener('mousemove', onDocumentMouseMove, false);
+    document.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener("pointerdown", onPointerdown, false)
     document.addEventListener("pointerup", onPointerup, false)
-    window.addEventListener('resize', onWindowResize, false);
+    window.addEventListener('resize', onResize, false);
 }
 
-function onWindowResize() {
+function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function onDocumentMouseMove(event) {
+function onMouseMove(event) {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 }
@@ -109,7 +109,7 @@ function animate() {
 
 function highlightPointedObject() {
     raycaster.setFromCamera(mouse, camera);
-    var intersects = raycaster.intersectObjects(scene.children);
+    const intersects = raycaster.intersectObjects(scene.children);
     if (intersects.length > 0) {
         if (intersected != intersects[0].object) {
             if (intersected) intersected.material.emissive.setHex(intersected.currentHex);

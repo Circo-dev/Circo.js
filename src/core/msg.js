@@ -10,12 +10,19 @@ export class Msg {
     }
 
     sendto(socket) {
-        const header = `Msg{${this.body.constructor.name}}`
+        const header = `Msg{${this.body.constructor.typename || this.body.constructor.name}}\n`
         const headerBytes = encoder.encode(header)
-        const zero = new Uint8Array([0])
         const msgBytes = msgpack.serialize(this)
-        socket.send(headerBytes)
-        socket.send(zero)
-        socket.send(msgBytes)
+        const buf = new Uint8Array(headerBytes.length + msgBytes.length + 1)
+        buf.set(headerBytes)
+        buf.set(msgBytes, headerBytes.length)
+        socket.send(buf)
     }
 }
+
+export class RegistrationRequest {
+    constructor(actoraddr) {
+        this.actoraddr = actoraddr
+    }
+}
+RegistrationRequest.typename = "CircoCore.RegistrationRequest"

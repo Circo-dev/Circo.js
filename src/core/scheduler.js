@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { Address } from "./postoffice.js"
-import { Msg } from "./msg.js"
+import { PostOffice, Addr, LOCALPOSTCODE } from "./postoffice.js"
+import { Msg, RegistrationRequest } from "./msg.js"
 
 export class ActorService {
     constructor(scheduler, actor) {
@@ -10,22 +10,36 @@ export class ActorService {
     }
 
     send(to, messagebody) {
-        this.scheduler.deliver(new Msg(this.actor.address, to, messagebody))
+        const msg = new Msg(this.actor.address, to, messagebody)
+        if (to.postcode === LOCALPOSTCODE) {
+            this.scheduler.deliver(msg)
+        } else {
+            this.scheduler.postoffice.send(msg)
+        }
+    }
+
+    register() {
+        this.send(this.scheduler.postoffice.masteraddr, new RegistrationRequest(this.actor.address))
     }
 }
 
 export class Scheduler {
-    constructor(actors = []) {
+    constructor(masterurl="ws://localhost:2497") {
+        this.postoffice = new PostOffice(masterurl, this)
         this.messagequeue = []
         this.actorcache = new Map()
         this.actors = []
+    }
+
+    async init(actors=[]) {
+        await this.postoffice.opened()
         actors.forEach(a => this.schedule(a))
     }
 
     schedule(actor) {
         this.actors.push(actor)
         actor.service = new ActorService(this, actor)
-        actor.address = new Address()
+        actor.address = new Addr()
         this.actorcache.set(actor.address.toString(), actor)
         actor.onschedule()
     }
@@ -51,5 +65,9 @@ export class Scheduler {
         while (this.messagequeue.length) {
             this.step()
         }
+    }
+
+    shutdown() {
+        this.postoffice.shutdown()
     }
 }

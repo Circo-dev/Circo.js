@@ -10,9 +10,10 @@ class MockSocket {
     }
 }
 
-QUnit.test("Message serialization", assert => {
+QUnit.test("Message serialization", async assert => {
     const actor = new TestActor()
-    const scheduler = new Scheduler([actor])  
+    const scheduler = new Scheduler()  
+    await scheduler.init([actor])
     const msg = new Msg(actor.address, actor.address, new TestMessage())
     msg.sendto(new MockSocket())
     assert.equal(1,1)
