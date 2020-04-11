@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { Msg } from "./msg.js"
+import { unmarshal } from "./msg.js"
 
 export const LOCALPOSTCODE="L"
 export const MASTERPOSTCODE="Master"
@@ -28,7 +28,6 @@ export class PostOffice {
         this.masteraddr = new Addr(MASTERPOSTCODE, 0)
         this.scheduler = scheduler
         this.queue = []
-        this.decoder = new TextDecoder()
         this.socket = new WebSocket(masterurl)
         this.socket.onmessage = this._onmessage
     }
@@ -45,23 +44,10 @@ export class PostOffice {
         })
     }
 
-    async unmarshal(blob) {
-        const buf = await blob.arrayBuffer()
-        const fullbytes = new Uint8Array(buf)
-        const newlinepos = fullbytes.indexOf(10)
-        const headerbytes = new Uint8Array(buf, 0, newlinepos)
-        const bodyBytes = new Uint8Array(buf, newlinepos + 1)
-        const header = this.decoder.decode(headerbytes)
-        const retval = msgpack.deserialize(bodyBytes)
-        retval.constructor = Msg
-        retval.body.typename = header
-        return retval
-    }
-
     _onmessage = (event) => {
         console.log(event.data)
         if (!this.scheduler) return
-        this.unmarshal(event.data).then((unmarshaled) => {
+        unmarshal(event.data).then((unmarshaled) => {
             console.log(unmarshaled)
             this.scheduler.run(unmarshaled)
         })
