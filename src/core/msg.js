@@ -64,3 +64,27 @@ export class RegistrationRequest {
     }
 }
 registerMsg("CircoCore.RegistrationRequest", RegistrationRequest)
+
+export class Registered {
+    constructor(actoraddr, accepted) {
+        this.actoraddr = actoraddr
+        this.accepted = accepted
+    }
+}
+registerMsg("CircoCore.Registered", Registered)
+
+export class NameQuery {
+    constructor(name) {
+        this.name = name
+    }
+}
+registerMsg("CircoCore.NameQuery", NameQuery)
+
+export class NameResponse {
+    constructor(query, handler) {
+        this.query = query
+        this.handler = handler
+    }
+}
+registerMsg("CircoCore.NameResponse", NameResponse)
+    

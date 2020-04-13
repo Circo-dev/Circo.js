@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
 import { PostOffice, Addr, LOCALPOSTCODE } from "./postoffice.js"
-import { Msg, RegistrationRequest } from "./msg.js"
+import { Msg, RegistrationRequest, NameQuery } from "./msg.js"
 
 export class ActorService {
     constructor(scheduler, actor) {
@@ -20,6 +20,10 @@ export class ActorService {
 
     register() {
         this.send(this.scheduler.postoffice.masteraddr, new RegistrationRequest(this.actor.address))
+    }
+
+    querymastername(name) {
+        this.send(this.scheduler.postoffice.masteraddr, new NameQuery(name))
     }
 }
 

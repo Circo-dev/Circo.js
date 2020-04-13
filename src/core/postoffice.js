@@ -18,7 +18,7 @@ export class Addr {
 
     constructor(postcode=LOCALPOSTCODE, box) {
         this.postcode = postcode
-        this.box = typeof box !== "undefined" ? box : Addr.generateId()
+        this.box = String(typeof box !== "undefined" ? box : Addr.generateId())
     }
 }
 

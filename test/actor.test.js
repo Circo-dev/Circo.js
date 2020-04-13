@@ -10,7 +10,7 @@ QUnit.test("Actor address", async assert => {
   const scheduler = new Scheduler()
   await scheduler.init([actor])
   assert.equal(typeof actor.address, "object")
-  assert.equal(typeof actor.address.box, "number")
+  assert.equal(typeof actor.address.box, "string")
 })
 
 QUnit.test("Actor messaging", async assert => {

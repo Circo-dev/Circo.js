@@ -2,14 +2,22 @@
 
 import { Actor } from "../src/core/actor.js"
 import { Scheduler } from "../src/core/scheduler.js"
+import { PeerListRequest } from "../src/diserta/cluster.js"
 
 class RemoteTestActor extends Actor {
     onschedule() {
         this.service.register(this)
     }
 
-    onRegistered(message) {
+    onRegistered = message => {
         console.log("Registered", message)
+        this.service.querymastername("cluster")
+    }
+
+    onNameResponse = response => {
+        console.log(response)
+        this.clusteraddr = response.handler
+        this.service.send(this.clusteraddr, new PeerListRequest(this.address))
     }
 }
 
