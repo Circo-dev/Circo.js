@@ -44,7 +44,7 @@ export class Scheduler {
         this.actors.push(actor)
         actor.service = new ActorService(this, actor)
         actor.address = new Addr()
-        this.actorcache.set(actor.address.toString(), actor)
+        this.actorcache.set(actor.address.box, actor)
         actor.onschedule()
     }
 
@@ -54,7 +54,7 @@ export class Scheduler {
 
     step() {
         const message = this.messagequeue.pop()
-        const actor = this.actorcache.get(message.target.toString())
+        const actor = this.actorcache.get(message.target.box)
         if (actor) {
             actor.onmessage(message.body)
         } else {

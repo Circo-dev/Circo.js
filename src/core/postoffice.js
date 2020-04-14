@@ -1,16 +1,22 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { unmarshal } from "./msg.js"
+import { unmarshal, Registered } from "./msg.js"
 
 export const LOCALPOSTCODE="L"
 export const MASTERPOSTCODE="Master"
 
+function toHexString(byteArray) {
+    return Array.from(byteArray, function(byte) {
+      return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+    }).join('')
+  }
+
 export class Addr {
     static generateId() {
         if (window.crypto && window.crypto.getRandomValues) {
-            const buf = new Uint32Array(2);
+            const buf = new Uint32Array(8);
             window.crypto.getRandomValues(buf)
-            return buf[0] * Math.pow(2, 20) + buf[1]; // TODO use 64 bit integers instead of 52, overcome js Number limitation
+            return toHexString(buf)
         }
         console.log("No crypto.getRandomValues(), falling back to Math.random()")
         return Math.round(Math.random() * Math.pow(2, 52))
@@ -44,12 +50,23 @@ export class PostOffice {
         })
     }
 
+    _updateactoraddr(registeredmsg) {
+        if (registeredmsg.body.accepted) {
+            const newaddr = registeredmsg.body.actoraddr
+            const actor = this.scheduler.actorcache.get(newaddr.box)    
+            if (actor) {
+                actor.address.postcode = newaddr.postcode
+                console.log("Actor registered: " + newaddr)
+            }
+        }
+    }
+
     _onmessage = (event) => {
-        console.log(event.data)
         if (!this.scheduler) return
-        unmarshal(event.data).then((unmarshaled) => {
-            console.log(unmarshaled)
-            this.scheduler.run(unmarshaled)
+        unmarshal(event.data).then((msg) => {
+            console.log(msg)
+            if (msg.body instanceof Registered) this._updateactoraddr(msg)
+            this.scheduler.run(msg)
         })
     }
 
