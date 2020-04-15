@@ -19,6 +19,10 @@ class RemoteTestActor extends Actor {
         this.clusteraddr = response.handler
         this.service.send(this.clusteraddr, new PeerListRequest(this.address))
     }
+
+    onPeerListResponse = response => {
+        console.log("Got cluster peer list", response.peers)
+    }
 }
 
 QUnit.test("Connection", async assert => {
