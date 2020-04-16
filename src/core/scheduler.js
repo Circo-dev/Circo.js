@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { Address } from "./postoffice.js"
-import { Message } from "./message.js"
+import { PostOffice, Addr, LOCALPOSTCODE } from "./postoffice.js"
+import { Msg, RegistrationRequest, NameQuery } from "./msg.js"
 
 export class ActorService {
     constructor(scheduler, actor) {
@@ -10,23 +10,41 @@ export class ActorService {
     }
 
     send(to, messagebody) {
-        this.scheduler.deliver(new Message(this.actor.address, to, messagebody))
+        const msg = new Msg(this.actor.address, to, messagebody)
+        if (to.postcode === LOCALPOSTCODE) {
+            this.scheduler.deliver(msg)
+        } else {
+            this.scheduler.postoffice.send(msg)
+        }
+    }
+
+    register() {
+        this.send(this.scheduler.postoffice.masteraddr, new RegistrationRequest(this.actor.address))
+    }
+
+    querymastername(name) {
+        this.send(this.scheduler.postoffice.masteraddr, new NameQuery(name))
     }
 }
 
 export class Scheduler {
-    constructor(actors = []) {
+    constructor(masterurl="ws://localhost:2497") {
+        this.postoffice = new PostOffice(masterurl, this)
         this.messagequeue = []
         this.actorcache = new Map()
         this.actors = []
+    }
+
+    async init(actors=[]) {
+        await this.postoffice.opened()
         actors.forEach(a => this.schedule(a))
     }
 
     schedule(actor) {
         this.actors.push(actor)
         actor.service = new ActorService(this, actor)
-        actor.address = new Address()
-        this.actorcache.set(actor.address.toString(), actor)
+        actor.address = new Addr()
+        this.actorcache.set(actor.address.box, actor)
         actor.onschedule()
     }
 
@@ -36,7 +54,7 @@ export class Scheduler {
 
     step() {
         const message = this.messagequeue.pop()
-        const actor = this.actorcache.get(message.target.toString())
+        const actor = this.actorcache.get(message.target.box)
         if (actor) {
             actor.onmessage(message.body)
         } else {
@@ -51,5 +69,9 @@ export class Scheduler {
         while (this.messagequeue.length) {
             this.step()
         }
+    }
+
+    shutdown() {
+        this.postoffice.shutdown()
     }
 }

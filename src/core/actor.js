@@ -20,8 +20,10 @@ export class Actor {
     
     _dispatchNameFor(messageBody) {
         const bodyType = typeof messageBody
-        return "on" + (bodyType === "object" ?
-            messageBody.constructor.name :
-            bodyType.charAt(0).toUpperCase() + bodyType.slice(1))
+        if (bodyType !== "object") {
+            return "on" + bodyType.charAt(0).toUpperCase() + bodyType.slice(1)
+        }
+        const constructorname = messageBody.constructor.name
+        return "on" + (constructorname === "Object" ? messageBody.typename : constructorname)
     }
 }
