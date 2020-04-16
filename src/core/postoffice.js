@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
 import { generateid } from "./util.js"
-import { unmarshal, Registered } from "./msg.js"
+import { unmarshal } from "./msg.js"
+import { Registered } from "./basemsgs.js"
 
 export const LOCALPOSTCODE="L"
 export const MASTERPOSTCODE="Master"

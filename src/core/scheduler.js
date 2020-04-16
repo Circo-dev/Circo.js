@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
 import { PostOffice, Addr, LOCALPOSTCODE } from "./postoffice.js"
-import { Msg, RegistrationRequest, NameQuery } from "./msg.js"
+import { Msg } from "./msg.js"
 import { ActorRequest, ActorResponse, TokenService } from "./token.js"
+import { RegistrationRequest, NameQuery } from "./basemsgs.js"
 
 export class ActorService {
     constructor(scheduler, actor) {
