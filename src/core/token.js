@@ -51,12 +51,12 @@ export class TokenService {
             this.timeouts.delete(key)
             this.deliverfn(new Msg(nulladdr, watcheraddr, new Timeout(token, watcheraddr)))
         }, deadlinems)
-        this.timeouts[key] = timeout
+        this.timeouts.set(key, timeout)
     }
 
     cleartimeout(token, watcheraddr) {
         const key = this.timeoutkey(token, watcheraddr)
-        clearTimeout(this.timeouts[key])
+        clearTimeout(this.timeouts.get(key))
         this.timeouts.delete(key)
     }
 }

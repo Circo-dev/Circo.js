@@ -52,13 +52,14 @@ export class PostOffice {
     _onmessage = (event) => {
         if (!this.scheduler) return
         unmarshal(event.data).then((msg) => {
-            console.log(msg)
+            // console.log("<=", msg)
             if (msg.body instanceof Registered) this._updateactoraddr(msg)
             this.scheduler.run(msg)
         })
     }
 
     send(msg) {
+        //console.log("=>", msg)
         msg.sendto(this.socket)
     }
 
