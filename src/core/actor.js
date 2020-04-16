@@ -27,3 +27,13 @@ export class Actor {
         return "on" + (constructorname === "Object" ? messageBody.typename : constructorname)
     }
 }
+
+export class RegisteredActor extends Actor {
+    constructor() {
+        super()
+    }
+
+    onschedule() {
+        this.service.register(this)
+    }
+}

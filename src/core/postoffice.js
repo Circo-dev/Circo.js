@@ -1,32 +1,19 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
+import { generateid } from "./util.js"
 import { unmarshal, Registered } from "./msg.js"
 
 export const LOCALPOSTCODE="L"
 export const MASTERPOSTCODE="Master"
 
-function toHexString(byteArray) {
-    return Array.from(byteArray, function(byte) {
-      return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-    }).join('')
-  }
-
 export class Addr {
-    static generateId() {
-        if (window.crypto && window.crypto.getRandomValues) {
-            const buf = new Uint32Array(8);
-            window.crypto.getRandomValues(buf)
-            return toHexString(buf)
-        }
-        console.log("No crypto.getRandomValues(), falling back to Math.random()")
-        return Math.round(Math.random() * Math.pow(2, 52))
-    }
-
     constructor(postcode=LOCALPOSTCODE, box) {
         this.postcode = postcode
-        this.box = String(typeof box !== "undefined" ? box : Addr.generateId())
+        this.box = String(typeof box !== "undefined" ? box : generateid())
     }
 }
+
+export const nulladdr = new Addr(LOCALPOSTCODE, 0)
 
 export class PostOffice {
     constructor(masterurl, scheduler) {
