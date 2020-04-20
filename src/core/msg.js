@@ -1,6 +1,16 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 import msgpack from "../../web_modules/@ygoe/msgpack/msgpack.js"
 
+const typeregistry = new Map()
+
+export function registerMsg(fulltypename, messagetype) {
+    if (typeregistry.has(fulltypename)) {
+        console.warn(`Overriding registered type '${fulltypename}'`)
+    }
+    messagetype.typename = fulltypename
+    typeregistry.set(fulltypename, messagetype.prototype)
+}
+
 export class Msg {
     constructor(sender, target, body) {
         this.sender = sender
@@ -47,14 +57,4 @@ export async function unmarshal(messageblob) {
         retval.body.__proto__ = registeredtype
     }
     return retval
-}
-
-const typeregistry = new Map()
-
-export function registerMsg(fulltypename, messagetype) {
-    if (typeregistry.has(fulltypename)) {
-        console.warn(`Overriding registered type '${fulltypename}'`)
-    }
-    messagetype.typename = fulltypename
-    typeregistry.set(fulltypename, messagetype.prototype)
 }
