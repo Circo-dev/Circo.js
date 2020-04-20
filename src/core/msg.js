@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
+import msgpack from "../../web_modules/@ygoe/msgpack/msgpack.js"
 
 export class Msg {
     constructor(sender, target, body) {

@@ -25,12 +25,14 @@
     "@pika/web": "^0.6.1"
   },
   "dependencies": {
+    "@ygoe/msgpack": "github:tisztamo/msgpack.js",
     "three": "^0.115.0"
   },
   "@pika/web": {
     "webDependencies": [
       "three/build/three.module.js",
-      "three/examples/jsm/controls/OrbitControls.js"
+      "three/examples/jsm/controls/OrbitControls.js",
+      "@ygoe/msgpack/msgpack.js"
     ]
   }
 }

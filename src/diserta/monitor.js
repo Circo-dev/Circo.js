@@ -24,16 +24,19 @@ export class MonitorClient extends RegisteredActor {
         super()
         this.monitoraddr = null
         this.queryInterval = null
+        this.view = null
     }
 
     onRegistered = _ => this.service.querymastername("monitor")
+
+    setView = view => this.view = view
 
     onNameResponse = response => {
         this.monitoraddr = response.handler
         this.startQuerying()
     }
 
-    startQuerying(intervalms=1) {
+    startQuerying(intervalms=200) {
         if (this.queryInterval) clearInterval(this.queryInterval)
         this.queryInterval = setInterval(
             () => {
@@ -46,7 +49,9 @@ export class MonitorClient extends RegisteredActor {
         console.warn("Monitoring request timeouted")
     }
 
-    onActorListResponse(response) {
-        //console.log("Got actor list", response.actors)
+    onActorListResponse = (response) => {
+        for (let actor of response.actors) {
+            this.view.putActor(actor)
+        }
     }
 }
