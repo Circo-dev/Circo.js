@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
 import { PostOffice, Addr, LOCALPOSTCODE } from "./postoffice.js"
-import { Msg, RegistrationRequest, NameQuery } from "./msg.js"
+import { Msg } from "./msg.js"
+import { ActorRequest, ActorResponse, TokenService } from "./token.js"
+import { RegistrationRequest, NameQuery } from "./basemsgs.js"
 
 export class ActorService {
     constructor(scheduler, actor) {
@@ -11,6 +13,9 @@ export class ActorService {
 
     send(to, messagebody) {
         const msg = new Msg(this.actor.address, to, messagebody)
+        if (messagebody instanceof ActorRequest) {
+            this.scheduler.tokenservice.settimeout(messagebody.token, this.actor.address)
+        }
         if (to.postcode === LOCALPOSTCODE) {
             this.scheduler.deliver(msg)
         } else {
@@ -33,6 +38,7 @@ export class Scheduler {
         this.messagequeue = []
         this.actorcache = new Map()
         this.actors = []
+        this.tokenservice = new TokenService(this.run)
     }
 
     async init(actors=[]) {
@@ -49,6 +55,9 @@ export class Scheduler {
     }
 
     deliver(message) {
+        if (message.body instanceof ActorResponse) {
+            this.tokenservice.cleartimeout(message.body.token, message.target)
+        }
         this.messagequeue.push(message) // local-only delivery
     }
 
@@ -62,7 +71,7 @@ export class Scheduler {
         }
     }
 
-    run(message=null) {
+    run = (message=null) => {
         if (message) {
             this.deliver(message)
         }

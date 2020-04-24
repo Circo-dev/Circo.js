@@ -1,4 +1,15 @@
 // SPDX-License-Identifier: LGPL-3.0-only
+import msgpack from "../../web_modules/@ygoe/msgpack/msgpack.js"
+
+const typeregistry = new Map()
+
+export function registerMsg(fulltypename, messagetype) {
+    if (typeregistry.has(fulltypename)) {
+        console.warn(`Overriding registered type '${fulltypename}'`)
+    }
+    messagetype.typename = fulltypename
+    typeregistry.set(fulltypename, messagetype.prototype)
+}
 
 export class Msg {
     constructor(sender, target, body) {
@@ -47,44 +58,3 @@ export async function unmarshal(messageblob) {
     }
     return retval
 }
-
-const typeregistry = new Map()
-
-export function registerMsg(fulltypename, messagetype) {
-    if (typeregistry.has(fulltypename)) {
-        console.warn(`Overriding registered type '${fulltypename}'`)
-    }
-    messagetype.typename = fulltypename
-    typeregistry.set(fulltypename, messagetype.prototype)
-}
-
-export class RegistrationRequest {
-    constructor(actoraddr) {
-        this.actoraddr = actoraddr
-    }
-}
-registerMsg("CircoCore.RegistrationRequest", RegistrationRequest)
-
-export class Registered {
-    constructor(actoraddr, accepted) {
-        this.actoraddr = actoraddr
-        this.accepted = accepted
-    }
-}
-registerMsg("CircoCore.Registered", Registered)
-
-export class NameQuery {
-    constructor(name) {
-        this.name = name
-    }
-}
-registerMsg("CircoCore.NameQuery", NameQuery)
-
-export class NameResponse {
-    constructor(query, handler) {
-        this.query = query
-        this.handler = handler
-    }
-}
-registerMsg("CircoCore.NameResponse", NameResponse)
-    

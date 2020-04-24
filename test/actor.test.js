@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import {Actor} from "../src/core/actor.js"
-import {Scheduler} from "../src/core/scheduler.js"
-import {TestActor,TestMessage,MESSAGE_TEXT,TESTMESSAGE_VAL} from "./testtypes.js"
+import { Actor } from "../src/core/actor.js"
+import { Scheduler } from "../src/core/scheduler.js"
+import { TestActor, TestMessage, MESSAGE_TEXT, TESTMESSAGE_VAL } from "./testtypes.js"
 
 QUnit.test("Actor address", async assert => {
   const actor = new Actor()
