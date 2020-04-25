@@ -36,7 +36,7 @@ export class MonitorClient extends RegisteredActor {
         this.startQuerying()
     }
 
-    startQuerying(intervalms=200) {
+    startQuerying(intervalms=500) {
         if (this.queryInterval) clearInterval(this.queryInterval)
         this.queryInterval = setInterval(
             () => {
