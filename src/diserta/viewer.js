@@ -95,11 +95,12 @@ export class PerspectiveView {
             const scale = typeof descriptor.scale === "function" ? descriptor.scale(actor) : descriptor.scale
             Object.assign(actorview.scale, scale)
         }
+        if (descriptor.color) {
+            const color = typeof descriptor.color === "function" ? descriptor.color(actor) : descriptor.color
+            actorview.material.color.setHex(color)
+        }
+        actorview.actor = actor
         actorview.updateMatrix()
-    }
-
-    createActorObject(actor) {
-
     }
 
     onResize = () => {
@@ -157,6 +158,7 @@ export class PerspectiveView {
                 this.intersected = intersects[0].object
                 this.intersected.currentHex = this.intersected.material.emissive.getHex()
                 this.intersected.material.emissive.setHex(0xff0000)
+                document.getElementById("watch").actor = this.intersected.actor
             }
         } else {
             if (this.intersected) this.intersected.material.emissive.setHex(this.intersected.currentHex)

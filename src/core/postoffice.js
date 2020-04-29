@@ -35,6 +35,7 @@ export class PostOffice {
         }
         return new Promise((resolve, reject) => {
             this.socket.onopen = () => resolve(true)
+            this.socket.onerror = (err) => reject(err)
         })
     }
 
