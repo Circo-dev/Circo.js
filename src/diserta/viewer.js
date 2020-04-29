@@ -33,7 +33,8 @@ export class PerspectiveView {
         this.mousepos = new THREE.Vector2()
         this.downpos = new THREE.Vector2(-1, -1)
         this.actors = new Map()
-        this.intersected = null
+        this.pointed = null
+        this.selected = null
         this.lookinterval = 0
         this.init(parentElement)
         this.animate()
@@ -123,10 +124,10 @@ export class PerspectiveView {
         if (this.downpos.distanceTo(new THREE.Vector2(event.clientX, event.clientY)) > 5) {
             return
         }
-        if (this.intersected) {
+        if (this.pointed) {
             let stepidx = 0
             const stepcount = 30
-            const targetpos = new THREE.Vector3().copy(this.intersected.position)
+            const targetpos = new THREE.Vector3().copy(this.pointed.position)
             const distance = this.camera.position.distanceTo(targetpos)
             const posdiff = new THREE.Vector3().copy(targetpos).sub(this.camera.position)
             const posdiffafteranim = new THREE.Vector3().copy(posdiff).divideScalar(distance / 250)
@@ -141,6 +142,7 @@ export class PerspectiveView {
                 }
             }, 16)
         }
+        this.selected = this.pointed
     }
 
     animate = () => {
@@ -153,22 +155,31 @@ export class PerspectiveView {
         this.raycaster.setFromCamera(this.mousepos, this.camera)
         const intersects = this.raycaster.intersectObjects(this.scene.children)
         if (intersects.length > 0) {
-            if (this.intersected != intersects[0].object) {
-                if (this.intersected) this.intersected.material.emissive.setHex(this.intersected.currentHex)
-                this.intersected = intersects[0].object
-                this.intersected.currentHex = this.intersected.material.emissive.getHex()
-                this.intersected.material.emissive.setHex(0xff0000)
-                document.getElementById("watch").actor = this.intersected.actor
+            if (this.pointed != intersects[0].object) {
+                if (this.pointed) this.pointed.material.emissive.setHex(this.pointed.currentHex)
+                this.pointed = intersects[0].object
+                this.pointed.currentHex = this.pointed.material.emissive.getHex()
+                this.pointed.material.emissive.setHex(0xff0000)
             }
         } else {
-            if (this.intersected) this.intersected.material.emissive.setHex(this.intersected.currentHex)
-            this.intersected = null
+            if (this.pointed) this.pointed.material.emissive.setHex(this.pointed.currentHex)
+            this.pointed = null
+        }
+    }
+
+    updateWatch() {
+        const target = document.getElementById("watch")
+        if (this.selected) {
+             target.actor = this.selected.actor
+        } else {
+            target.actor = this.pointed ? this.pointed.actor : null
         }
     }
 
     render() {
         this.highlightPointedObject()
         this.renderer.render(this.scene, this.camera)
+        this.updateWatch()
     }
 
     createControls() {
