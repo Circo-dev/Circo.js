@@ -3,6 +3,7 @@
 import { registerMsg } from "../core/msg.js"
 import { RegisteredActor } from "../core/actor.js"
 import { ActorRequest, ActorResponse } from "../core/token.js"
+import { setactors } from "./filter.js"
 
 class ActorListRequest extends ActorRequest {
     constructor(respondto) {
@@ -50,8 +51,10 @@ export class MonitorClient extends RegisteredActor {
     }
 
     onActorListResponse = (response) => {
+        setactors(response.actors)
         for (let actor of response.actors) {
             this.view.putActor(actor)
         }
+        this.view.redraw()
     }
 }

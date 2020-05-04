@@ -5,7 +5,8 @@ body {
 
 #fatal {
     position: absolute;
-    top: 0;
+    top: 40px;
     color: red;
+    font-size: large;
     margin: 10px;
 }

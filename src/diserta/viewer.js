@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import * as THREE from '../../web_modules/three/build/three.module.js'
+import * as THREE from "../../web_modules/three/build/three.module.js"
 import { OrbitControls } from "../../web_modules/three/examples/jsm/controls/OrbitControls.js"
+import { thloggler } from "../core/util.js"
+import { dist, inhops } from "./helpers/filterlib.js"
 
 const defaultdescriptor = {
     geometry: new THREE.BoxBufferGeometry(20, 20, 20),
@@ -30,12 +32,16 @@ export function registerActor(typeName, descriptor) {
 export class PerspectiveView {
     constructor(parentElement = document.body) {
         this.parentElement = parentElement
+        this.filterfn = null
         this.mousepos = new THREE.Vector2()
         this.downpos = new THREE.Vector2(-1, -1)
         this.actors = new Map()
+        this.edges = new Map()
         this.pointed = null
         this.selected = null
         this.lookinterval = 0
+        this.light1 = null
+        this.light2 = null
         this.init(parentElement)
         this.animate()
     }
@@ -50,12 +56,12 @@ export class PerspectiveView {
         this.scene = new THREE.Scene()
         this.scene.background = new THREE.Color(0xf0f0f0)
 
-        const light = new THREE.DirectionalLight(0xffffff, 1)
-        light.position.set(0.7, .5, .8).normalize()
-        this.scene.add(light)
-        const light2 = new THREE.DirectionalLight(0xffffff, 1)
-        light2.position.set(-0.7, -.5, -.8).normalize()
-        this.scene.add(light2)
+        this.light1 = new THREE.DirectionalLight(0xffffff, 1)
+        this.light1.position.set(0.7, .5, .8).normalize()
+        this.scene.add(this.light1)
+        this.light2 = new THREE.DirectionalLight(0xffffff, 1)
+        this.light2.position.set(-0.7, -.5, -.8).normalize()
+        this.scene.add(this.light2)
 
         this.raycaster = new THREE.Raycaster()
 
@@ -65,9 +71,10 @@ export class PerspectiveView {
         this.container.appendChild(this.renderer.domElement)
 
         this.createControls()
-        document.addEventListener('mousemove', this.onMouseMove, false)
-        document.addEventListener("pointerdown", this.onPointerdown, false)
-        document.addEventListener("pointerup", this.onPointerup, false)
+        this.container.addEventListener('mousemove', this.onMouseMove, false)
+        this.container.addEventListener("pointerdown", this.onPointerdown, false)
+        this.container.addEventListener("pointerup", this.onPointerup, false)
+        this.container.addEventListener("keydown", this.onkeydown, false)
         window.addEventListener('resize', this.onResize, false)
     }
 
@@ -100,8 +107,46 @@ export class PerspectiveView {
             const color = typeof descriptor.color === "function" ? descriptor.color(actor) : descriptor.color
             actorview.material.color.setHex(color)
         }
+        
+        try {
+            actorview.visible = this.filterfn ? 
+            this.filterfn(actor, this.selected ? this.selected.actor : null, this.pointed ? this.pointed.actor : null,
+                dist, inhops) : true
+        } catch (e) {
+            thloggler()("Exception while evaulating filter:", e)
+        }
+        
         actorview.actor = actor
         actorview.updateMatrix()
+    }
+
+    redrawEdges() {
+        const actors = this.actors
+        for (var source of this.actors.values()) {
+            if (!source.actor.extra) return
+            const box = source.actor.box
+            for (var val of Object.values(source.actor.extra)) {
+                const target = actors.get(val)
+                if (target) {
+                    const targetactor = target.actor
+                    let edge = this.edges.get(box + val)
+                    const points = [new THREE.Vector3(source.actor.x, source.actor.y, source.actor.z), new THREE.Vector3(targetactor.x, targetactor.y, targetactor.z)]
+                    if (!edge) {
+                        const geometry = new THREE.BufferGeometry().setFromPoints( points )
+                        edge = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xa0a0a0 }))
+                        this.scene.add(edge)
+                        this.edges.set(box + val, edge)
+                    } else {
+                        edge.geometry = new THREE.BufferGeometry().setFromPoints( points )
+                    }
+                    edge.visible = source.visible && target.visible
+                }
+            }
+        }
+    }
+
+    redraw() {
+        this.redrawEdges()
     }
 
     onResize = () => {
@@ -142,7 +187,31 @@ export class PerspectiveView {
                 }
             }, 16)
         }
-        this.selected = this.pointed
+        this.select(this.pointed)
+    }
+
+    step(length=1) {
+        const direction = new THREE.Vector3().copy(this.controls.target).sub(this.camera.position).normalize().multiplyScalar(40 * length)
+        this.camera.position.add(direction)
+        this.controls.target.add(direction)
+    }
+
+    onkeydown = event => {
+        switch (event.code) {
+            case "KeyW":
+            case "KeyI":
+                this.step()
+                break
+            case "KeyS":
+            case "KeyK":
+                this.step(-1)
+            default:
+                break
+        }
+    }
+
+    select(obj) {
+        this.selected = obj
     }
 
     animate = () => {
@@ -154,10 +223,14 @@ export class PerspectiveView {
     highlightPointedObject() {
         this.raycaster.setFromCamera(this.mousepos, this.camera)
         const intersects = this.raycaster.intersectObjects(this.scene.children)
-        if (intersects.length > 0) {
-            if (this.pointed != intersects[0].object) {
+        let firstvisibleidx = 0
+        while (firstvisibleidx < intersects.length && (!intersects[firstvisibleidx].object.visible || !intersects[firstvisibleidx].object.actor)) {
+            firstvisibleidx++
+        }
+        if (firstvisibleidx < intersects.length) {
+            if (this.pointed != intersects[firstvisibleidx].object) {
                 if (this.pointed) this.pointed.material.emissive.setHex(this.pointed.currentHex)
-                this.pointed = intersects[0].object
+                this.pointed = intersects[firstvisibleidx].object
                 this.pointed.currentHex = this.pointed.material.emissive.getHex()
                 this.pointed.material.emissive.setHex(0xff0000)
             }
@@ -185,9 +258,12 @@ export class PerspectiveView {
     createControls() {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement)
         this.controls.rotateSpeed = 1.0
-        this.controls.zoomSpeed = 1.2
-        this.controls.panSpeed = 0.8
-        this.controls.keys = [65, 83, 68]
+        this.controls.zoomSpeed = 3.2
+        this.controls.panSpeed = 1.0
+    }
+
+    setfilter(filterfn) {
+        this.filterfn = filterfn
     }
 }
 

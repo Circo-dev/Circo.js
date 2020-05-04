@@ -11,7 +11,7 @@ class Watch extends Component {
 
   static get styles() {
     return css`
-      .container {font-family: "Gill Sans", sans-serif; text-shadow: 1px 1px 2px white; position: absolute; top: 10px}
+      .container {font-family: "Gill Sans", sans-serif; text-shadow: 1px 1px 2px white; position: absolute; top: 80px;background-color: rgba(240,240,240,0.44)}
       .attr {text-align: right;padding-right: 10px;font-weight: 700}
       .extraattr {text-align: right; font-style: italic; padding-right: 7px}
     `;

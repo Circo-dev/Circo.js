@@ -17,3 +17,15 @@ export function generateid() {
     console.log("No crypto.getRandomValues(), falling back to Math.random()")
     return "" + Math.round(Math.random() * Math.pow(2, 52))
 }
+
+const sink = () => undefined
+const nextLogTSs = new Map()
+export function thloggler(throttleid=0) {
+  const ts = Date.now()
+  const allowedts = nextLogTSs.get(throttleid) || 0
+  if (ts > allowedts) {
+    nextLogTSs.set(throttleid, ts + 500)
+    return console.log
+  }
+  return sink
+}
