@@ -5,39 +5,55 @@ class Filter extends Component {
 
   static get properties() {
     return {
-      value: { type: String }
+      actorfilter: { type: String },
+      showedges: { type: Boolean }
     }
   }
 
   static get styles() {
     return css`
       .container { position: absolute; top: 10px; left: 10px;}
-      .filterinput { font-size: 150%; width: 600px; opacity: 0.8}
+      .filterinput { font-size: 110%; width: 600px; opacity: 0.8}
     `;
   }
 
   constructor() {
     super()
-    this.value = "!selected || selected.box == me.box || inhops(me, selected, 8)"
-  }
-
-  dispatchvalue = value => {
-    this.dispatchEvent(new CustomEvent('filterinput', { detail: { value: this.value }, bubbles: true, composed: true }));
+    this.actorfilter = "!selected || selected.box == me.box || onpath(me, selected, [\"left|right\"])"
+    this.showedges = false
   }
 
   firstUpdated() {
-    this.dispatchvalue()
+    this.dispatchActorfilter()
+  }
+
+  dispatchActorfilter = value => {
+    this.dispatchEvent(new CustomEvent('filterinput', { detail: { value: this.actorfilter }, bubbles: true, composed: true }));
   }
 
   handleinput = e => {
-    this.value = e.target.value
-    this.dispatchvalue()
+    this.actorfilter = e.target.value
+    this.dispatchActorfilter()
+  }
+
+  dispatchShowedges = value => {
+    this.dispatchEvent(new CustomEvent('showedgeschanged', { detail: { value: this.showedges }, bubbles: true, composed: true }));
+  }
+
+  handleShowedges = e => {
+    this.showedges = e.target.checked
+    this.dispatchShowedges()
   }
 
   render() {
     return html`
     <div class="container">
-        <input class="filterinput" type="text" placeholder="Filter" @input=${this.handleinput} value="${this.value}"></input>
+      <div>
+        <input class="filterinput" type="text" placeholder="Filter" @input=${this.handleinput} value="${this.actorfilter}"></input>
+      </div>
+      <div>
+        <input id="showedges" type="checkbox" ?checked=${this.showedges} @click=${this.handleShowedges}></input><label for="showedges">Show Edges</label>
+      </div>
     </div>
 `
   }

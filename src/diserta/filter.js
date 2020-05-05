@@ -18,5 +18,5 @@ export function filterfn(source) {
         return alwaystrue
     } 
     const fullsource = '"use strict";return (' + source + ')'
-    return Function("me", "selected", "pointed", "dist", "inhops", fullsource)
+    return Function("me", "selected", "pointed", "dist", "inhops", "onpath", fullsource)
 }

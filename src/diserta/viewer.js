@@ -3,7 +3,7 @@
 import * as THREE from "../../web_modules/three/build/three.module.js"
 import { OrbitControls } from "../../web_modules/three/examples/jsm/controls/OrbitControls.js"
 import { thloggler } from "../core/util.js"
-import { dist, inhops } from "./helpers/filterlib.js"
+import { dist, inhops, onpath } from "./helpers/filterlib.js"
 
 const defaultdescriptor = {
     geometry: new THREE.BoxBufferGeometry(20, 20, 20),
@@ -32,6 +32,7 @@ export function registerActor(typeName, descriptor) {
 export class PerspectiveView {
     constructor(parentElement = document.body) {
         this.parentElement = parentElement
+        this.monitor = null // MonitorClient. Would be better to use events
         this.filterfn = null
         this.mousepos = new THREE.Vector2()
         this.downpos = new THREE.Vector2(-1, -1)
@@ -111,7 +112,7 @@ export class PerspectiveView {
         try {
             actorview.visible = this.filterfn ? 
             this.filterfn(actor, this.selected ? this.selected.actor : null, this.pointed ? this.pointed.actor : null,
-                dist, inhops) : true
+                dist, inhops, onpath) : true
         } catch (e) {
             thloggler()("Exception while evaulating filter:", e)
         }
@@ -146,7 +147,14 @@ export class PerspectiveView {
     }
 
     redraw() {
-        this.redrawEdges()
+        if (this.parentElement.querySelector("#filter").showedges) {
+            this.redrawEdges()
+        } else {
+            for (var edge of this.edges.values()) {
+                this.scene.remove(edge)
+            }
+            this.edges.clear()
+        }
     }
 
     onResize = () => {
@@ -169,7 +177,7 @@ export class PerspectiveView {
         if (this.downpos.distanceTo(new THREE.Vector2(event.clientX, event.clientY)) > 5) {
             return
         }
-        if (this.pointed) {
+        if (this.pointed && this.selected === this.pointed) {
             let stepidx = 0
             const stepcount = 30
             const targetpos = new THREE.Vector3().copy(this.pointed.position)
@@ -212,6 +220,9 @@ export class PerspectiveView {
 
     select(obj) {
         this.selected = obj
+        if (obj && obj.actor && this.monitor) {
+            this.monitor && this.monitor.actorselected(obj.actor) // TODO be an event source for loose coupling
+        }
     }
 
     animate = () => {
@@ -260,10 +271,15 @@ export class PerspectiveView {
         this.controls.rotateSpeed = 1.0
         this.controls.zoomSpeed = 3.2
         this.controls.panSpeed = 1.0
+        this.controls.screenSpacePanning = true
     }
 
     setfilter(filterfn) {
         this.filterfn = filterfn
+    }
+
+    setmonitor(monitor) {
+        this.monitor = monitor
     }
 }
 

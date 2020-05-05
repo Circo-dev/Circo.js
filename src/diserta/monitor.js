@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
+import { Addr, MASTERPOSTCODE } from "../core/postoffice.js"
 import { registerMsg } from "../core/msg.js"
 import { RegisteredActor } from "../core/actor.js"
 import { ActorRequest, ActorResponse } from "../core/token.js"
@@ -20,6 +21,22 @@ class ActorListResponse extends ActorResponse {
 }
 registerMsg("CircoCore.ActorListResponse", ActorListResponse)
 
+class ActorInterfaceRequest extends ActorRequest {
+    constructor(respondto, box) {
+        super()
+        this.respondto = respondto
+        this.box = box
+    }
+}
+registerMsg("CircoCore.ActorInterfaceRequest", ActorInterfaceRequest)
+
+class ActorInterfaceResponse extends ActorResponse {
+    constructor(messagetypes) {
+        this.messagetypes = messagetypes
+    }
+}
+registerMsg("CircoCore.ActorInterfaceResponse", ActorInterfaceResponse)
+
 export class MonitorClient extends RegisteredActor {
     constructor() {
         super()
@@ -30,7 +47,10 @@ export class MonitorClient extends RegisteredActor {
 
     onRegistered = _ => this.service.querymastername("monitor")
 
-    setView = view => this.view = view
+    setview(view) {
+        this.view = view
+        this.view.setmonitor(this)
+    }
 
     onNameResponse = response => {
         this.monitoraddr = response.handler
@@ -52,9 +72,21 @@ export class MonitorClient extends RegisteredActor {
 
     onActorListResponse = (response) => {
         setactors(response.actors)
-        for (let actor of response.actors) {
+        for (var actor of response.actors) {
             this.view.putActor(actor)
         }
         this.view.redraw()
+    }
+
+    requestActorInterface(addr) { // TODO send should return a promise if the message is an ActorRequest
+        this.service.send(this.monitoraddr, new ActorInterfaceRequest(this.address, addr))
+    }
+
+    onActorInterfaceResponse = (response) => {
+        console.log(response)
+    }
+
+    actorselected(actorinfo) {
+        this.requestActorInterface(actorinfo.box)
     }
 }

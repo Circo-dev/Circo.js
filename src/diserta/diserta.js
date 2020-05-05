@@ -36,7 +36,7 @@ function initfilter() {
 
 async function start() {
     const monitor = new MonitorClient()
-    monitor.setView(view)
+    monitor.setview(view)
     initfilter()
     const scheduler = new Scheduler()
     try {
