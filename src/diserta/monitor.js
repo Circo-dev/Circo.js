@@ -78,12 +78,8 @@ export class MonitorClient extends RegisteredActor {
         this.view.redraw()
     }
 
-    requestActorInterface(addr) { // TODO send should return a promise if the message is an ActorRequest
-        this.service.send(this.monitoraddr, new ActorInterfaceRequest(this.address, addr))
-    }
-
-    onActorInterfaceResponse = (response) => {
-        console.log(response)
+    requestActorInterface(addr) {
+        this.service.send(this.monitoraddr, new ActorInterfaceRequest(this.address, addr)).then(response => console.log(response))
     }
 
     actorselected(actorinfo) {

@@ -19,7 +19,7 @@ class Filter extends Component {
 
   constructor() {
     super()
-    this.actorfilter = "!selected || selected.box == me.box || onpath(me, selected, [\"left|right\"])"
+    this.actorfilter = "!selected || selected.box == me.box || onpath(me, selected, [/left|right/])  || onpath( selected, me, [/sibling/]) || onpath( selected, me, [/left|right/]) "
     this.showedges = false
   }
 

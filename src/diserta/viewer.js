@@ -3,7 +3,7 @@
 import * as THREE from "../../web_modules/three/build/three.module.js"
 import { OrbitControls } from "../../web_modules/three/examples/jsm/controls/OrbitControls.js"
 import { thloggler } from "../core/util.js"
-import { dist, inhops, onpath } from "./helpers/filterlib.js"
+import { dist, onpath } from "./helpers/filterlib.js"
 
 const defaultdescriptor = {
     geometry: new THREE.BoxBufferGeometry(20, 20, 20),
@@ -109,12 +109,13 @@ export class PerspectiveView {
             actorview.material.color.setHex(color)
         }
         
-        try {
+        try {// TODO find a better place for this
             actorview.visible = this.filterfn ? 
             this.filterfn(actor, this.selected ? this.selected.actor : null, this.pointed ? this.pointed.actor : null,
-                dist, inhops, onpath) : true
+                dist, onpath) : true
         } catch (e) {
-            thloggler()("Exception while evaulating filter:", e)
+            thloggler()("Exception while evaulating filter:", e) // TODO: output to screen
+            this.filterfn=()=>true
         }
         
         actorview.actor = actor
