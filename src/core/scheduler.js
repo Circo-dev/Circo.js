@@ -13,14 +13,16 @@ export class ActorService {
 
     send(to, messagebody) {
         const msg = new Msg(this.actor.address, to, messagebody)
+        let retval = undefined
         if (messagebody instanceof ActorRequest) {
-            this.scheduler.tokenservice.settimeout(messagebody.token, this.actor.address)
+            retval = this.scheduler.tokenservice.settimeout(messagebody.token, this.actor.address)
         }
         if (to.postcode === LOCALPOSTCODE) {
             this.scheduler.deliver(msg)
         } else {
             this.scheduler.postoffice.send(msg)
         }
+        return retval
     }
 
     register() {
@@ -56,7 +58,7 @@ export class Scheduler {
 
     deliver(message) {
         if (message.body instanceof ActorResponse) {
-            this.tokenservice.cleartimeout(message.body.token, message.target)
+            this.tokenservice.resolvetimeout(message.body, message.target)
         }
         this.messagequeue.push(message) // local-only delivery
     }

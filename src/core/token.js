@@ -32,6 +32,10 @@ export class Timeout {
     constructor(token, watcher) {
         this.token = token
         this.watcher = watcher
+        this.promise = new Promise((resolve, reject) => {
+            this.resolve = resolve
+            this.reject = reject
+        })
     }
 }
 
@@ -47,16 +51,20 @@ export class TokenService {
 
     settimeout(token, watcheraddr, deadlinems=1000) {
         const key = this.timeoutkey(token, watcheraddr)
-        const timeout = setTimeout(() => {
+        const timeout = new Timeout(token, watcheraddr)
+        timeout.jstimeoutid = setTimeout(() => {
             this.timeouts.delete(key)
-            this.deliverfn(new Msg(nulladdr, watcheraddr, new Timeout(token, watcheraddr)))
+            timeout.reject().then(() => this.deliverfn(new Msg(nulladdr, watcheraddr, timeout)))
         }, deadlinems)
         this.timeouts.set(key, timeout)
+        return timeout.promise
     }
 
-    cleartimeout(token, watcheraddr) {
-        const key = this.timeoutkey(token, watcheraddr)
-        clearTimeout(this.timeouts.get(key))
+    resolvetimeout(response, watcheraddr) {
+        const key = this.timeoutkey(response.token, watcheraddr)
+        const timeout = this.timeouts.get(key)
+        clearTimeout(timeout.jstimeoutid)
         this.timeouts.delete(key)
+        timeout.resolve(response)
     }
 }
