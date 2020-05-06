@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
+import { ActorResponse } from "./token.js"
 
 export class Actor {
     constructor() {
@@ -13,7 +14,7 @@ export class Actor {
         const handler = this[dispatchName]
         if (handler) {
             handler(messageBody)
-        } else {
+        } else if (!messageBody instanceof ActorResponse){
             console.error("No method '" + dispatchName + "' defined on " + this.constructor.name)
         }
     }

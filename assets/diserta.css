@@ -2,3 +2,11 @@ body {
     margin: 0;
     overflow: hidden;
 }
+
+#fatal {
+    position: absolute;
+    top: 50px;
+    color: red;
+    font-size: large;
+    margin: 10px;
+}

@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
+import { Addr, MASTERPOSTCODE } from "../core/postoffice.js"
 import { registerMsg } from "../core/msg.js"
 import { RegisteredActor } from "../core/actor.js"
 import { ActorRequest, ActorResponse } from "../core/token.js"
+import { setactors } from "./filter.js"
 
 class ActorListRequest extends ActorRequest {
     constructor(respondto) {
@@ -19,6 +21,22 @@ class ActorListResponse extends ActorResponse {
 }
 registerMsg("CircoCore.ActorListResponse", ActorListResponse)
 
+class ActorInterfaceRequest extends ActorRequest {
+    constructor(respondto, box) {
+        super()
+        this.respondto = respondto
+        this.box = box
+    }
+}
+registerMsg("CircoCore.ActorInterfaceRequest", ActorInterfaceRequest)
+
+class ActorInterfaceResponse extends ActorResponse {
+    constructor(messagetypes) {
+        this.messagetypes = messagetypes
+    }
+}
+registerMsg("CircoCore.ActorInterfaceResponse", ActorInterfaceResponse)
+
 export class MonitorClient extends RegisteredActor {
     constructor() {
         super()
@@ -29,20 +47,23 @@ export class MonitorClient extends RegisteredActor {
 
     onRegistered = _ => this.service.querymastername("monitor")
 
-    setView = view => this.view = view
+    setview(view) {
+        this.view = view
+        this.view.setmonitor(this)
+    }
 
     onNameResponse = response => {
         this.monitoraddr = response.handler
         this.startQuerying()
     }
 
-    startQuerying(intervalms=200) {
+    startQuerying(intervalms=500) {
+        const query = () => {
+            this.service.send(this.monitoraddr, new ActorListRequest(this.address))
+        }
         if (this.queryInterval) clearInterval(this.queryInterval)
-        this.queryInterval = setInterval(
-            () => {
-                this.service.send(this.monitoraddr, new ActorListRequest(this.address))
-            }, intervalms
-        )
+        this.queryInterval = setInterval(query, intervalms)
+        query()
     }
 
     onTimeout(timeout) {
@@ -50,8 +71,18 @@ export class MonitorClient extends RegisteredActor {
     }
 
     onActorListResponse = (response) => {
-        for (let actor of response.actors) {
+        setactors(response.actors)
+        for (var actor of response.actors) {
             this.view.putActor(actor)
         }
+        this.view.redraw()
+    }
+
+    requestActorInterface(addr) {
+        this.service.send(this.monitoraddr, new ActorInterfaceRequest(this.address, addr)).then(response => console.log(response))
+    }
+
+    actorselected(actorinfo) {
+        this.requestActorInterface(actorinfo.box)
     }
 }
