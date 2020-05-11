@@ -46,8 +46,8 @@ export function onpath(actor1, actor2, path=[/.*/], limit=8) {// TODO speed up c
             throw new FilterError("Path must be a single RegExp or an array of them. Got " + path)
         }
     }
-    if (limit < 0 || limit > 10) {
-        throw new FilterError("Invalid limit (must be nonnegative, max 10): " + limit)
+    if (limit < 0 || limit > 18) {
+        throw new FilterError("Invalid limit (must be nonnegative, max 18): " + limit)
     }
     return onpathimpl(actor1, actor2, path, limit, 0)
 }

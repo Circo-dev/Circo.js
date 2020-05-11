@@ -8,17 +8,20 @@ import "./watch.js"
 import { filterfn } from "./filter.js"
 import "./filtercomponent.js"
 
+const ITEMS_PER_NODE = 10
+const RED_AFTER = ITEMS_PER_NODE * 0.95 - 1
+
 registerActor("Main.SearchTreeTest.TreeNode{UInt32}",  {
     geometry: new THREE.TetrahedronBufferGeometry(20, 2),
     scale: function(actor) {
-        if (actor.extra.localsize) {
-            return { x: 0.2 + (actor.extra.localsize - 2000) / 6000 , y: 0.2 + (actor.extra.localsize - 2000) / 6000, z: 0.5 + (actor.extra.localsize - 2000) / 2000  }
-        } else {
+        if (actor.extra.left) {
             return { x: 0.2 , y: 0.2, z: 0.2 }
+        } else {
+            return { x: 0.2 + (actor.extra.size - ITEMS_PER_NODE / 2) / 6000 , y: 0.2 + (actor.extra.size - ITEMS_PER_NODE / 2) / 6000, z: 0.5 + (actor.extra.size - ITEMS_PER_NODE / 2) / 2000  }
         }
     },
     color: function(actor) {
-        return actor.extra.localsize > 3800 ? 0xff0000 : (actor.extra.localsize > 0 ? 0x00b000 : 0x606060)
+        return actor.extra.size < RED_AFTER ? 0x00b000 : (actor.extra.left ? 0x606060 : 0xff0000)
     }
 })
 

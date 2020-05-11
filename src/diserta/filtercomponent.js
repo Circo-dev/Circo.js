@@ -19,7 +19,7 @@ class Filter extends Component {
 
   constructor() {
     super()
-    this.actorfilter = "!selected || selected.box == me.box || onpath(me, selected, [/left|right/])  || onpath( selected, me, [/sibling/]) || onpath( selected, me, [/left|right/]) "
+    this.actorfilter = "onpath(me, selected, [/left|right/])  || onpath( selected, me, [/sibling/]) || onpath( selected, me, [/left|right/]) "
     this.showedges = false
   }
 
@@ -50,9 +50,7 @@ class Filter extends Component {
     <div class="container">
       <div>
         <input class="filterinput" type="text" placeholder="Filter" @input=${this.handleinput} value="${this.actorfilter}"></input>
-      </div>
-      <div>
-        <input id="showedges" type="checkbox" ?checked=${this.showedges} @click=${this.handleShowedges}></input><label for="showedges">Show Edges</label>
+        <input id="showedges" type="checkbox" ?checked=${this.showedges} @click=${this.handleShowedges}></input><label for="showedges">Edges</label>
       </div>
     </div>
 `

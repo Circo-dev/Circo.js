@@ -17,6 +17,6 @@ export function filterfn(source) {
     if (source === "") {
         return alwaystrue
     } 
-    const fullsource = '"use strict";return (' + source + ')'
+    const fullsource = '"use strict";return (!selected || selected.box == me.box || ' + source + ')'
     return Function("me", "selected", "pointed", "dist", "onpath", fullsource)
 }
