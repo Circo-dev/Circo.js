@@ -45,7 +45,7 @@ export class PostOffice {
             const actor = this.scheduler.actorcache.get(newaddr.box)    
             if (actor) {
                 actor.address.postcode = newaddr.postcode
-                console.log("Actor registered: " + newaddr)
+                console.log("Actor registered: ", newaddr)
             }
         }
     }

@@ -37,18 +37,31 @@ function initfilter() {
     })
 }
 
-async function start() {
+async function createmonitor(view, port) {
     const monitor = new MonitorClient()
+    const scheduler = new Scheduler("ws://localhost:" + port)
+    await scheduler.init([monitor])
     monitor.setview(view)
+    return {monitor, scheduler}
+}
+
+async function start() {
     initfilter()
-    const scheduler = new Scheduler()
+    const schedulers = []
     try {
-        await scheduler.init([monitor])
+        let port = 2497
+        while (true) {
+            const {monitor, scheduler} = await createmonitor(view, port)
+            schedulers.push(scheduler)
+            port = port + 1
+        }
     } catch (e) {
-        document.getElementById("fatal").textContent = "Unable to connect to backend actor system. Please reload to try again."
-        console.error("Websocket error:", e)
+        if (!schedulers.length) {
+            document.getElementById("fatal").textContent = "Unable to connect to backend actor system. Please reload to try again."
+            console.error("Websocket error:", e)    
+        }
     }
-    scheduler.run()    
+    schedulers.map(scheduler => scheduler.run())
 }
 
 start()

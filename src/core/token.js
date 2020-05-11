@@ -54,7 +54,7 @@ export class TokenService {
         const timeout = new Timeout(token, watcheraddr)
         timeout.jstimeoutid = setTimeout(() => {
             this.timeouts.delete(key)
-            timeout.reject && timeout.reject()
+            timeout.reject && timeout.reject(timeout)
             this.deliverfn(new Msg(nulladdr, watcheraddr, timeout))
         }, deadlinems)
         this.timeouts.set(key, timeout)

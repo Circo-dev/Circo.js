@@ -32,7 +32,7 @@ export function registerActor(typeName, descriptor) {
 export class PerspectiveView {
     constructor(parentElement = document.body) {
         this.parentElement = parentElement
-        this.monitor = null // MonitorClient. Would be better to use events
+        this.eventhandlers = new Map()
         this.filterfn = null
         this.mousepos = new THREE.Vector2()
         this.downpos = new THREE.Vector2(-1, -1)
@@ -221,8 +221,8 @@ export class PerspectiveView {
 
     select(obj) {
         this.selected = obj
-        if (obj && obj.actor && this.monitor) {
-            this.monitor && this.monitor.actorselected(obj.actor) // TODO be an event source for loose coupling
+        if (obj && obj.actor) {
+            this.fire("actorselected", obj.actor)
         }
     }
 
@@ -279,8 +279,17 @@ export class PerspectiveView {
         this.filterfn = filterfn
     }
 
-    setmonitor(monitor) {
-        this.monitor = monitor
+    addEventListener(eventname, handlerfn) {
+        const handlers = this.eventhandlers.get(eventname) || new Array()
+        handlers.push(handlerfn)
+        this.eventhandlers.set(eventname, handlers)
+    }
+
+    fire(eventname, data) {
+        const handlers = this.eventhandlers.get(eventname)
+        if (handlers) {
+            handlers.forEach(handler => handler(data))
+        }
     }
 }
 

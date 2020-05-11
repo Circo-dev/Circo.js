@@ -37,6 +37,8 @@ class ActorInterfaceResponse extends ActorResponse {
 }
 registerMsg("CircoCore.ActorInterfaceResponse", ActorInterfaceResponse)
 
+const monitor = Symbol("monitor")
+
 export class MonitorClient extends RegisteredActor {
     constructor() {
         super()
@@ -49,7 +51,7 @@ export class MonitorClient extends RegisteredActor {
 
     setview(view) {
         this.view = view
-        this.view.setmonitor(this)
+        this.view.addEventListener("actorselected", this.actorselected)
     }
 
     onNameResponse = response => {
@@ -57,7 +59,7 @@ export class MonitorClient extends RegisteredActor {
         this.startQuerying()
     }
 
-    startQuerying(intervalms=500) {
+    startQuerying(intervalms=1000) {
         const query = () => {
             this.service.send(this.monitoraddr, new ActorListRequest(this.address))
         }
@@ -73,6 +75,7 @@ export class MonitorClient extends RegisteredActor {
     onActorListResponse = (response) => {
         setactors(response.actors)
         for (var actor of response.actors) {
+            actor[monitor] = this
             this.view.putActor(actor)
         }
         this.view.redraw()
@@ -82,7 +85,9 @@ export class MonitorClient extends RegisteredActor {
         this.service.send(this.monitoraddr, new ActorInterfaceRequest(this.address, addr)).then(response => console.log(response))
     }
 
-    actorselected(actorinfo) {
-        this.requestActorInterface(actorinfo.box)
+    actorselected = actorinfo => {
+        if (actorinfo[monitor] === this) {
+            this.requestActorInterface(actorinfo.box)
+        }
     }
 }
