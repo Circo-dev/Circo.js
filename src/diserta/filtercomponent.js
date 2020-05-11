@@ -1,6 +1,7 @@
 import {Component} from "./helpers/component.js"
 import {html, css} from "../../../../web_modules/lit-element.js"
 
+const DEFAULT_FILTER = "!selected || selected.box == me.box || onpath(me, selected, [/left|right/])  || onpath( selected, me, [/sibling/]) || onpath( selected, me, [/left|right/])"
 class Filter extends Component {
 
   static get properties() {
@@ -19,7 +20,7 @@ class Filter extends Component {
 
   constructor() {
     super()
-    this.actorfilter = "onpath(me, selected, [/left|right/])  || onpath( selected, me, [/sibling/]) || onpath( selected, me, [/left|right/]) "
+    this.actorfilter = DEFAULT_FILTER
     this.showedges = false
   }
 
@@ -45,11 +46,23 @@ class Filter extends Component {
     this.dispatchShowedges()
   }
 
+  inputfiller(text) {
+    return (e) => {
+      this.actorfilter = text
+      this.dispatchActorfilter()
+      e.preventDefault()
+    }
+  }
+
   render() {
     return html`
     <div class="container">
       <div>
         <input class="filterinput" type="text" placeholder="Filter" @input=${this.handleinput} value="${this.actorfilter}"></input>
+        <a href="" @click=${this.inputfiller('me.typename === "CircoCore.MonitorActor{MonitorService}"')}>schedulers</a>
+        <a href="" @click=${this.inputfiller(DEFAULT_FILTER)}>default</a>
+      </div>
+      <div>
         <input id="showedges" type="checkbox" ?checked=${this.showedges} @click=${this.handleShowedges}></input><label for="showedges">Edges</label>
       </div>
     </div>
