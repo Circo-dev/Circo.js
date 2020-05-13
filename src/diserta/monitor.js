@@ -59,7 +59,7 @@ export class MonitorClient extends RegisteredActor {
         this.startQuerying()
     }
 
-    startQuerying(intervalms=300) {
+    startQuerying(intervalms=1000) {
         const query = () => {
             this.service.send(this.monitoraddr, new ActorListRequest(this.address))
         }

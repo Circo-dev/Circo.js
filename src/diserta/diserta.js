@@ -11,6 +11,7 @@ import { registerMsg } from "../core/msg.js"
 
 const ITEMS_PER_NODE = 100
 const RED_AFTER = ITEMS_PER_NODE * 0.95 - 1
+const SPHERESCALE_FACTOR = 1 / ITEMS_PER_NODE / 2
 
 registerActor("Main.SearchTreeTest.TreeNode{UInt32}",  {
     geometry: new THREE.TetrahedronBufferGeometry(20, 2),
@@ -18,7 +19,7 @@ registerActor("Main.SearchTreeTest.TreeNode{UInt32}",  {
         if (actor.extra.left) {
             return { x: 0.2 , y: 0.2, z: 0.2 }
         } else {
-            return { x: 0.2 + (actor.extra.size - ITEMS_PER_NODE / 2) / 6000 , y: 0.2 + (actor.extra.size - ITEMS_PER_NODE / 2) / 6000, z: 0.5 + (actor.extra.size - ITEMS_PER_NODE / 2) / 2000  }
+            return { x: 0.2 + actor.extra.size * SPHERESCALE_FACTOR , y: 0.2 + actor.extra.size * SPHERESCALE_FACTOR, z: 0.2 + actor.extra.size * SPHERESCALE_FACTOR }
         }
     },
     color: function(actor) {
@@ -72,7 +73,7 @@ function initfilter() {
 
 async function createmonitor(view, port) {
     const monitor = new MonitorClient()
-    const scheduler = new Scheduler("ws://localhost:" + port)
+    const scheduler = new Scheduler("ws://" + window.location.hostname + ":" + port)
     await scheduler.init([monitor])
     monitor.setview(view)
     return {monitor, scheduler}
