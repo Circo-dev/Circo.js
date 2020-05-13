@@ -7,8 +7,9 @@ import { PerspectiveView, registerActor } from "./viewer.js"
 import "./watch.js"
 import { filterfn } from "./filter.js"
 import "./filtercomponent.js"
+import { registerMsg } from "../core/msg.js"
 
-const ITEMS_PER_NODE = 10
+const ITEMS_PER_NODE = 100
 const RED_AFTER = ITEMS_PER_NODE * 0.95 - 1
 
 registerActor("Main.SearchTreeTest.TreeNode{UInt32}",  {
@@ -24,6 +25,38 @@ registerActor("Main.SearchTreeTest.TreeNode{UInt32}",  {
         return actor.extra.size < RED_AFTER ? 0x00b000 : (actor.extra.left ? 0x606060 : 0xff0000)
     }
 })
+
+class Stop {
+    constructor() {
+        this.a=42
+    }
+}
+registerMsg("Main.SearchTreeTest.Stop", Stop)
+class Step {
+    constructor() {
+        this.a=42
+    }
+}
+registerMsg("Main.SearchTreeTest.Step", Step)
+class RunSlow {
+    constructor() {
+        this.a=42
+    }
+}
+registerMsg("Main.SearchTreeTest.RunSlow", RunSlow)
+class RunFast {
+    constructor() {
+        this.a=42
+    }
+}
+registerMsg("Main.SearchTreeTest.RunFast", RunFast)
+class RunFull {
+    constructor() {
+        this.a=42
+    }
+}
+registerMsg("Main.SearchTreeTest.RunFull", RunFull)
+
 
 let view = new PerspectiveView()
 

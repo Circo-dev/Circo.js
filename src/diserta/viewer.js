@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
 import * as THREE from "../../web_modules/three/build/three.module.js"
-import { OrbitControls } from "../../web_modules/three/examples/jsm/controls/OrbitControls.js"
+import { TrackballControls } from "../../web_modules/three/examples/jsm/controls/TrackballControls.js"
 import { thloggler } from "../core/util.js"
 import { dist, onpath } from "./helpers/filterlib.js"
+
+const SELECTED_COLOR = 0x0000aa
 
 const defaultdescriptor = {
     geometry: new THREE.BoxBufferGeometry(20, 20, 20),
@@ -220,7 +222,9 @@ export class PerspectiveView {
     }
 
     select(obj) {
+        if (this.selected) this.selected.material.emissive.setHex(this.selected.origHex)
         this.selected = obj
+        if (obj) obj.material.emissive.setHex(SELECTED_COLOR)
         if (obj && obj.actor) {
             this.fire("actorselected", obj.actor)
         }
@@ -241,14 +245,22 @@ export class PerspectiveView {
         }
         if (firstvisibleidx < intersects.length) {
             if (this.pointed != intersects[firstvisibleidx].object) {
-                if (this.pointed) this.pointed.material.emissive.setHex(this.pointed.currentHex)
+                if (this.pointed) {
+                    this.pointed.material.emissive.setHex(this.pointed === this.selected ? SELECTED_COLOR : this.pointed.origHex)
+                }
                 this.pointed = intersects[firstvisibleidx].object
-                this.pointed.currentHex = this.pointed.material.emissive.getHex()
+                if (this.pointed !== this.selected) this.pointed.origHex = this.pointed.material.emissive.getHex()
                 this.pointed.material.emissive.setHex(0xff0000)
             }
         } else {
-            if (this.pointed) this.pointed.material.emissive.setHex(this.pointed.currentHex)
+            if (this.pointed) this.pointed.material.emissive.setHex(this.pointed === this.selected ? SELECTED_COLOR : this.pointed.origHex)
             this.pointed = null
+        }
+    }
+
+    setActorInterface(actorInterfaceResponse) {
+        if (this.selected && this.selected.actor.box === actorInterfaceResponse.box) {
+            this.selected.messagetypes = actorInterfaceResponse.messagetypes
         }
     }
 
@@ -256,8 +268,10 @@ export class PerspectiveView {
         const target = document.getElementById("watch")
         if (this.selected) {
              target.actor = this.selected.actor
+             target.messagetypes = this.selected.messagetypes
         } else {
             target.actor = this.pointed ? this.pointed.actor : null
+            target.messagetypes = null
         }
     }
 
@@ -268,8 +282,8 @@ export class PerspectiveView {
     }
 
     createControls() {
-        this.controls = new OrbitControls(this.camera, this.renderer.domElement)
-        this.controls.rotateSpeed = 1.0
+        this.controls = new TrackballControls(this.camera, this.renderer.domElement)
+        this.controls.rotateSpeed = 2.0
         this.controls.zoomSpeed = 3.2
         this.controls.panSpeed = 1.0
         this.controls.screenSpacePanning = true

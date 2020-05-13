@@ -1,5 +1,6 @@
 import {Component} from "./helpers/component.js"
 import {html, css} from "../../../../web_modules/lit-element.js"
+import { isRegisteredMsg } from "../core/msg.js"
 
 class Watch extends Component {
 
@@ -29,6 +30,10 @@ class Watch extends Component {
      `
   }
 
+  stripPackage(typename) {
+    return typename.substr(typename.lastIndexOf(".") + 1)
+  }
+
   render() {
     if (!this.actor) return null
     return html`
@@ -41,6 +46,13 @@ class Watch extends Component {
           </tr>
         `)}
       </table>
+      ${this.messagetypes && html`
+        <div>
+          ${this.messagetypes.filter(msgtype => isRegisteredMsg(msgtype.typename)).map(messagetype => html`
+          <span><a href="#" @click=${() => messagetype.send()}>${this.stripPackage(messagetype.typename)}</a> </span>
+          `)}
+        </div>
+      `}
     </div>
 `
   }

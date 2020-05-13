@@ -1,6 +1,10 @@
 import {LitElement} from "../../../web_modules/lit-element.js"
 
 export class Component extends LitElement {
+  constructor() {
+    super()
+  }
+  
   el(id) {
     return this.renderRoot.getElementById(id)
   }

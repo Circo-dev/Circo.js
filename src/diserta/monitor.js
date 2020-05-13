@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { Addr, MASTERPOSTCODE } from "../core/postoffice.js"
-import { registerMsg } from "../core/msg.js"
+import { registerMsg, createMsg } from "../core/msg.js"
 import { RegisteredActor } from "../core/actor.js"
 import { ActorRequest, ActorResponse } from "../core/token.js"
 import { setactors } from "./filter.js"
+import { Addr, MASTERPOSTCODE } from "../core/postoffice.js"
 
 class ActorListRequest extends ActorRequest {
     constructor(respondto) {
@@ -59,7 +59,7 @@ export class MonitorClient extends RegisteredActor {
         this.startQuerying()
     }
 
-    startQuerying(intervalms=1000) {
+    startQuerying(intervalms=300) {
         const query = () => {
             this.service.send(this.monitoraddr, new ActorListRequest(this.address))
         }
@@ -82,7 +82,17 @@ export class MonitorClient extends RegisteredActor {
     }
 
     requestActorInterface(addr) {
-        this.service.send(this.monitoraddr, new ActorInterfaceRequest(this.address, addr)).then(response => console.log(response))
+        this.service.send(this.monitoraddr, new ActorInterfaceRequest(this.address, addr))
+        .then(response => {
+            console.log(response)
+            this.view.setActorInterface({
+                box: response.box,
+                messagetypes: response.messagetypes.map(typename => { return {
+                    typename,
+                    send: () => this.service.send(new Addr(MASTERPOSTCODE, response.box), createMsg(typename))
+                }})
+            })
+        })
     }
 
     actorselected = actorinfo => {
