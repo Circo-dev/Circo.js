@@ -51,6 +51,7 @@ export class PerspectiveView {
 
     init(parentElement) {
         this.container = document.createElement('div')
+        this.container.tabIndex = 0
         parentElement.appendChild(this.container)
 
         this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000)
@@ -174,6 +175,7 @@ export class PerspectiveView {
     onPointerdown = (event) => {
         this.downpos.x = event.clientX
         this.downpos.y = event.clientY
+        this.container.focus()
     }
 
     onPointerup = (event) => {
@@ -208,6 +210,7 @@ export class PerspectiveView {
     }
 
     onkeydown = event => {
+
         switch (event.code) {
             case "KeyW":
             case "KeyI":
