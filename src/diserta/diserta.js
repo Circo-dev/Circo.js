@@ -14,7 +14,7 @@ const RED_AFTER = ITEMS_PER_NODE * 0.95 - 1
 const SPHERESCALE_FACTOR = 1 / ITEMS_PER_NODE / 2
 
 registerActor("Main.SearchTreeTest.TreeNode{UInt32}",  {
-    geometry: new THREE.TetrahedronBufferGeometry(20, 2),
+    geometry: new THREE.TetrahedronBufferGeometry(10, 2),
     scale: function(actor) {
         if (actor.extra.left) {
             return { x: 0.2 , y: 0.2, z: 0.2 }
@@ -23,7 +23,7 @@ registerActor("Main.SearchTreeTest.TreeNode{UInt32}",  {
         }
     },
     color: function(actor) {
-        return actor.extra.size < RED_AFTER ? 0x00b000 : (actor.extra.left ? 0x606060 : 0xff0000)
+        return actor.extra.size < RED_AFTER ? 0x389826 : (actor.extra.left ? 0x9558b2 : 0xcb3c33)
     }
 })
 

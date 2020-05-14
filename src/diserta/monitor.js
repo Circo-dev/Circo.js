@@ -59,7 +59,7 @@ export class MonitorClient extends RegisteredActor {
         this.startQuerying()
     }
 
-    startQuerying(intervalms=1000) {
+    startQuerying(intervalms=400) {
         const query = () => {
             this.service.send(this.monitoraddr, new ActorListRequest(this.address))
         }
@@ -84,7 +84,6 @@ export class MonitorClient extends RegisteredActor {
     requestActorInterface(addr) {
         this.service.send(this.monitoraddr, new ActorInterfaceRequest(this.address, addr))
         .then(response => {
-            console.log(response)
             this.view.setActorInterface({
                 box: response.box,
                 messagetypes: response.messagetypes.map(typename => { return {

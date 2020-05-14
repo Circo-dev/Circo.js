@@ -5,20 +5,12 @@ import { TrackballControls } from "../../web_modules/three/examples/jsm/controls
 import { thloggler } from "../core/util.js"
 import { dist, onpath } from "./helpers/filterlib.js"
 
-const SELECTED_COLOR = 0x0000aa
+const SELECTED_COLOR = 0x606060
 
 const defaultdescriptor = {
     geometry: new THREE.BoxBufferGeometry(20, 20, 20),
-    scale: {
-        x: 1,
-        y: 1,
-        z: 1,
-    },
-    rotation: {
-        x: 0,
-        y: 0,
-        z: 0
-    }
+    scale: { x: 1, y: 1, z: 1 },
+    rotation: { x: 0, y: 0, z: 0 }
 }
 const actortypes = new Map()
 

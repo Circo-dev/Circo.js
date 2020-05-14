@@ -34,6 +34,13 @@ class Watch extends Component {
     return typename.substr(typename.lastIndexOf(".") + 1)
   }
 
+  renderValue(attr, value) {
+    if (attr === "x" || attr === "y" || attr === "z") {
+      return Math.round(value * 100) / 100
+    }
+    return typeof(value) === "object" ? this.renderObject(value) : value
+  }
+
   render() {
     if (!this.actor) return null
     return html`
@@ -42,7 +49,7 @@ class Watch extends Component {
         ${Object.entries(this.actor).map( ([attr, value]) => html`
           <tr>
             <td class="attr">${attr}</td>
-            <td>${typeof(value) === "object" ? this.renderObject(value) : value}</td>
+            <td>${this.renderValue(attr, value)}</td>
           </tr>
         `)}
       </table>
