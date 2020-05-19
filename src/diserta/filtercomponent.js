@@ -1,8 +1,13 @@
 import {Component} from "./helpers/component.js"
 import {html, css} from "../../../../web_modules/lit-element.js"
 
-class Filter extends Component {
+const filters = [
+  { label: "coordinator", filter:"/Coordinator/.test(me.typename)"},
+  { label: "schedulers", filter:"/MonitorActor/.test(me.typename)"},
+  { label: "default", filter: "!selected || selected.box == me.box || !selected.typename.match(/TreeNode/) || onpath(me, selected, [/left|right/])  || onpath( selected, me, [/sibling/]) || onpath( selected, me, [/left|right/])"},
+]
 
+class Filter extends Component {
   static get properties() {
     return {
       actorfilter: { type: String },
@@ -12,28 +17,33 @@ class Filter extends Component {
 
   static get styles() {
     return css`
-      .container { position: absolute; top: 10px; left: 10px;}
-      .filterinput { font-size: 110%; width: 600px; opacity: 0.8}
+      .container { position: absolute; top: 8px; left: 4px }
+      .filterinput { font-size: 110%; width: 600px; opacity: 0.8 }
+      .filler { margin-right: 5px }
+      .options { margin-top: 5px }
     `;
   }
 
   constructor() {
     super()
-    this.actorfilter = "!selected || selected.box == me.box || onpath(me, selected, [/left|right/])  || onpath( selected, me, [/sibling/]) || onpath( selected, me, [/left|right/]) "
     this.showedges = false
+    this.editedtext = null
   }
 
   firstUpdated() {
-    this.dispatchActorfilter()
+    this.setactorfilter(filters[filters.length - 1].filter)
   }
 
-  dispatchActorfilter = value => {
+  setactorfilter = value => {
+    this.actorfilter = value
+    if (!filters.find(filter => filter.filter === value)) {
+      this.editedtext = value
+    }
     this.dispatchEvent(new CustomEvent('filterinput', { detail: { value: this.actorfilter }, bubbles: true, composed: true }));
   }
 
   handleinput = e => {
-    this.actorfilter = e.target.value
-    this.dispatchActorfilter()
+    this.setactorfilter(e.target.value)
   }
 
   dispatchShowedges = value => {
@@ -45,14 +55,25 @@ class Filter extends Component {
     this.dispatchShowedges()
   }
 
+  inputfiller(text) {
+    return (e) => {
+      e.preventDefault()
+      this.setactorfilter(text)
+    }
+  }
+
   render() {
     return html`
     <div class="container">
       <div>
-        <input class="filterinput" type="text" placeholder="Filter" @input=${this.handleinput} value="${this.actorfilter}"></input>
+        <input class="filterinput" type="text" placeholder="Filter" @input=${this.handleinput} .value="${this.actorfilter}"></input>
+        <div>
+          ${filters.map(({label, filter}) => html`<a class="filler" href="" @click=${this.inputfiller(filter)}>${label}</a>`)}
+          ${this.editedtext && html`<a href="" @click=${this.inputfiller(this.editedtext)}>edited</a>`}
+        </div>
       </div>
-      <div>
-        <input id="showedges" type="checkbox" ?checked=${this.showedges} @click=${this.handleShowedges}></input><label for="showedges">Show Edges</label>
+      <div class="options">
+        <input id="showedges" type="checkbox" ?checked=${this.showedges} @click=${this.handleShowedges}></input><label for="showedges">Edges</label>
       </div>
     </div>
 `

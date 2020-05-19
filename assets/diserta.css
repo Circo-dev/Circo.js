@@ -3,10 +3,15 @@ body {
     overflow: hidden;
 }
 
-#fatal {
+#fatalcontainer {
     position: absolute;
-    top: 50px;
+    top: 50%;
+    left: 50%;
     color: red;
-    font-size: large;
+    font-size: x-large;
     margin: 10px;
+}
+
+#fatal {
+    margin-left: -50%;
 }

@@ -1,22 +1,16 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
 import * as THREE from "../../web_modules/three/build/three.module.js"
-import { OrbitControls } from "../../web_modules/three/examples/jsm/controls/OrbitControls.js"
+import { TrackballControls } from "../../web_modules/three/examples/jsm/controls/TrackballControls.js"
 import { thloggler } from "../core/util.js"
 import { dist, onpath } from "./helpers/filterlib.js"
 
+const SELECTED_COLOR = 0x606060
+
 const defaultdescriptor = {
     geometry: new THREE.BoxBufferGeometry(20, 20, 20),
-    scale: {
-        x: 1,
-        y: 1,
-        z: 1,
-    },
-    rotation: {
-        x: 0,
-        y: 0,
-        z: 0
-    }
+    scale: { x: 1, y: 1, z: 1 },
+    rotation: { x: 0, y: 0, z: 0 }
 }
 const actortypes = new Map()
 
@@ -32,7 +26,7 @@ export function registerActor(typeName, descriptor) {
 export class PerspectiveView {
     constructor(parentElement = document.body) {
         this.parentElement = parentElement
-        this.monitor = null // MonitorClient. Would be better to use events
+        this.eventhandlers = new Map()
         this.filterfn = null
         this.mousepos = new THREE.Vector2()
         this.downpos = new THREE.Vector2(-1, -1)
@@ -49,6 +43,7 @@ export class PerspectiveView {
 
     init(parentElement) {
         this.container = document.createElement('div')
+        this.container.tabIndex = 0
         parentElement.appendChild(this.container)
 
         this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000)
@@ -172,6 +167,7 @@ export class PerspectiveView {
     onPointerdown = (event) => {
         this.downpos.x = event.clientX
         this.downpos.y = event.clientY
+        this.container.focus()
     }
 
     onPointerup = (event) => {
@@ -206,6 +202,7 @@ export class PerspectiveView {
     }
 
     onkeydown = event => {
+
         switch (event.code) {
             case "KeyW":
             case "KeyI":
@@ -220,9 +217,11 @@ export class PerspectiveView {
     }
 
     select(obj) {
+        if (this.selected) this.selected.material.emissive.setHex(this.selected.origHex)
         this.selected = obj
-        if (obj && obj.actor && this.monitor) {
-            this.monitor && this.monitor.actorselected(obj.actor) // TODO be an event source for loose coupling
+        if (obj) obj.material.emissive.setHex(SELECTED_COLOR)
+        if (obj && obj.actor) {
+            this.fire("actorselected", obj.actor)
         }
     }
 
@@ -241,14 +240,22 @@ export class PerspectiveView {
         }
         if (firstvisibleidx < intersects.length) {
             if (this.pointed != intersects[firstvisibleidx].object) {
-                if (this.pointed) this.pointed.material.emissive.setHex(this.pointed.currentHex)
+                if (this.pointed) {
+                    this.pointed.material.emissive.setHex(this.pointed === this.selected ? SELECTED_COLOR : this.pointed.origHex)
+                }
                 this.pointed = intersects[firstvisibleidx].object
-                this.pointed.currentHex = this.pointed.material.emissive.getHex()
+                if (this.pointed !== this.selected) this.pointed.origHex = this.pointed.material.emissive.getHex()
                 this.pointed.material.emissive.setHex(0xff0000)
             }
         } else {
-            if (this.pointed) this.pointed.material.emissive.setHex(this.pointed.currentHex)
+            if (this.pointed) this.pointed.material.emissive.setHex(this.pointed === this.selected ? SELECTED_COLOR : this.pointed.origHex)
             this.pointed = null
+        }
+    }
+
+    setActorInterface(actorInterfaceResponse) {
+        if (this.selected && this.selected.actor.box === actorInterfaceResponse.box) {
+            this.selected.messagetypes = actorInterfaceResponse.messagetypes
         }
     }
 
@@ -256,8 +263,10 @@ export class PerspectiveView {
         const target = document.getElementById("watch")
         if (this.selected) {
              target.actor = this.selected.actor
+             target.messagetypes = this.selected.messagetypes
         } else {
             target.actor = this.pointed ? this.pointed.actor : null
+            target.messagetypes = null
         }
     }
 
@@ -268,8 +277,8 @@ export class PerspectiveView {
     }
 
     createControls() {
-        this.controls = new OrbitControls(this.camera, this.renderer.domElement)
-        this.controls.rotateSpeed = 1.0
+        this.controls = new TrackballControls(this.camera, this.renderer.domElement)
+        this.controls.rotateSpeed = 2.0
         this.controls.zoomSpeed = 3.2
         this.controls.panSpeed = 1.0
         this.controls.screenSpacePanning = true
@@ -279,8 +288,17 @@ export class PerspectiveView {
         this.filterfn = filterfn
     }
 
-    setmonitor(monitor) {
-        this.monitor = monitor
+    addEventListener(eventname, handlerfn) {
+        const handlers = this.eventhandlers.get(eventname) || new Array()
+        handlers.push(handlerfn)
+        this.eventhandlers.set(eventname, handlers)
+    }
+
+    fire(eventname, data) {
+        const handlers = this.eventhandlers.get(eventname)
+        if (handlers) {
+            handlers.forEach(handler => handler(data))
+        }
     }
 }
 

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { Addr, MASTERPOSTCODE } from "../core/postoffice.js"
-import { registerMsg } from "../core/msg.js"
+import { registerMsg, createMsg } from "../core/msg.js"
 import { RegisteredActor } from "../core/actor.js"
 import { ActorRequest, ActorResponse } from "../core/token.js"
 import { setactors } from "./filter.js"
+import { Addr, MASTERPOSTCODE } from "../core/postoffice.js"
 
 class ActorListRequest extends ActorRequest {
     constructor(respondto) {
@@ -37,6 +37,8 @@ class ActorInterfaceResponse extends ActorResponse {
 }
 registerMsg("CircoCore.ActorInterfaceResponse", ActorInterfaceResponse)
 
+const monitor = Symbol("monitor")
+
 export class MonitorClient extends RegisteredActor {
     constructor() {
         super()
@@ -49,7 +51,7 @@ export class MonitorClient extends RegisteredActor {
 
     setview(view) {
         this.view = view
-        this.view.setmonitor(this)
+        this.view.addEventListener("actorselected", this.actorselected)
     }
 
     onNameResponse = response => {
@@ -57,7 +59,7 @@ export class MonitorClient extends RegisteredActor {
         this.startQuerying()
     }
 
-    startQuerying(intervalms=500) {
+    startQuerying(intervalms=400) {
         const query = () => {
             this.service.send(this.monitoraddr, new ActorListRequest(this.address))
         }
@@ -73,16 +75,28 @@ export class MonitorClient extends RegisteredActor {
     onActorListResponse = (response) => {
         setactors(response.actors)
         for (var actor of response.actors) {
+            actor[monitor] = this
             this.view.putActor(actor)
         }
         this.view.redraw()
     }
 
     requestActorInterface(addr) {
-        this.service.send(this.monitoraddr, new ActorInterfaceRequest(this.address, addr)).then(response => console.log(response))
+        this.service.send(this.monitoraddr, new ActorInterfaceRequest(this.address, addr))
+        .then(response => {
+            this.view.setActorInterface({
+                box: response.box,
+                messagetypes: response.messagetypes.map(typename => { return {
+                    typename,
+                    send: () => this.service.send(new Addr(MASTERPOSTCODE, response.box), createMsg(typename))
+                }})
+            })
+        })
     }
 
-    actorselected(actorinfo) {
-        this.requestActorInterface(actorinfo.box)
+    actorselected = actorinfo => {
+        if (actorinfo[monitor] === this) {
+            this.requestActorInterface(actorinfo.box)
+        }
     }
 }

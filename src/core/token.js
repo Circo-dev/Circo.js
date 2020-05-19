@@ -49,12 +49,12 @@ export class TokenService {
         return `${token.id}_${watcheraddr.box}`
     }
 
-    settimeout(token, watcheraddr, deadlinems=1000) {
+    settimeout(token, watcheraddr, deadlinems=2000) {
         const key = this.timeoutkey(token, watcheraddr)
         const timeout = new Timeout(token, watcheraddr)
         timeout.jstimeoutid = setTimeout(() => {
             this.timeouts.delete(key)
-            timeout.reject()
+            timeout.reject && timeout.reject(timeout)
             this.deliverfn(new Msg(nulladdr, watcheraddr, timeout))
         }, deadlinems)
         this.timeouts.set(key, timeout)

@@ -11,6 +11,14 @@ export function registerMsg(fulltypename, messagetype) {
     typeregistry.set(fulltypename, messagetype.prototype)
 }
 
+export function createMsg(fulltypename) {
+    return new (typeregistry.get(fulltypename).constructor)()
+}
+
+export function isRegisteredMsg(fulltypename) {
+    return typeregistry.has(fulltypename)
+}
+
 export class Msg {
     constructor(sender, target, body) {
         this.sender = sender

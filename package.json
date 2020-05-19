@@ -33,7 +33,7 @@
     "webDependencies": [
       "lit-element",
       "three/build/three.module.js",
-      "three/examples/jsm/controls/OrbitControls.js",
+      "three/examples/jsm/controls/TrackballControls.js",
       "@ygoe/msgpack/msgpack.js"
     ]
   }
