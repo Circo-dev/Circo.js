@@ -9,9 +9,14 @@ import { filterfn } from "./filter.js"
 import "./filtercomponent.js"
 import { registerMsg } from "../core/msg.js"
 
-const ITEMS_PER_NODE = 100
+const ITEMS_PER_NODE = 1000
 const RED_AFTER = ITEMS_PER_NODE * 0.95 - 1
 const SPHERESCALE_FACTOR = 1 / ITEMS_PER_NODE / 2
+
+const nonimportantDescriptor = {
+    geometry: new THREE.TetrahedronBufferGeometry(4, 0),
+    color: 0xa0a0a0
+}
 
 registerActor("Main.SearchTreeTest.TreeNode{UInt32}",  {
     geometry: new THREE.TetrahedronBufferGeometry(10, 2),
@@ -26,6 +31,23 @@ registerActor("Main.SearchTreeTest.TreeNode{UInt32}",  {
         return actor.extra.size < RED_AFTER ? 0x389826 : (actor.extra.left ? 0x9558b2 : 0xcb3c33)
     }
 })
+
+registerActor("Main.ClusterFullTest.ListItem{Float64}",  {
+    geometry: new THREE.BoxBufferGeometry(10, 10, 10)
+})
+
+registerActor("CircoCore.MonitorActor{MonitorService}",  {
+    geometry: new THREE.BoxBufferGeometry(5, 5, 5),
+    scale: actor => {
+        const plussize = actor.extra.actorcount * 0.00004
+        // Works only for origo-centered setups:
+        return { x: 1 + plussize * Math.abs(actor.y + actor.z), y: 1 + plussize * Math.abs(actor.x + actor.z), z: 1 + plussize * Math.abs(actor.x + actor.y)}
+    }
+})
+
+registerActor("CircoCore.MigrationHelper", nonimportantDescriptor)
+registerActor("ClusterActor", nonimportantDescriptor)
+registerActor("EventDispatcher", nonimportantDescriptor)
 
 class Stop {
     constructor() {

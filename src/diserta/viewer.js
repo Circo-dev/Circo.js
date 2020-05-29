@@ -2,6 +2,9 @@
 
 import * as THREE from "../../web_modules/three/build/three.module.js"
 import { TrackballControls } from "../../web_modules/three/examples/jsm/controls/TrackballControls.js"
+import { EffectComposer } from "../../web_modules/three/examples/jsm/postprocessing/EffectComposer.js"
+import { RenderPass } from "../../web_modules/three/examples/jsm/postprocessing/RenderPass.js"
+import { OutlinePass } from "../../web_modules/three/examples/jsm/postprocessing/OutlinePass.js"
 import { thloggler } from "../core/util.js"
 import { dist, onpath } from "./helpers/filterlib.js"
 
@@ -50,7 +53,7 @@ export class PerspectiveView {
         this.camera.position.z = 500
 
         this.scene = new THREE.Scene()
-        this.scene.background = new THREE.Color(0xf0f0f0)
+        this.scene.background = new THREE.Color(0xd0d0d0)
 
         this.light1 = new THREE.DirectionalLight(0xffffff, 1)
         this.light1.position.set(0.7, .5, .8).normalize()
@@ -65,6 +68,16 @@ export class PerspectiveView {
         this.renderer.setPixelRatio(window.devicePixelRatio)
         this.renderer.setSize(window.innerWidth, window.innerHeight)
         this.container.appendChild(this.renderer.domElement)
+
+        this.composer = new EffectComposer(this.renderer)
+        this.composer.addPass(new RenderPass(this.scene, this.camera))
+        this.outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), this.scene, this.camera )
+        this.outlinePass.edgeStrength = 3
+        this.outlinePass.edgeGlow = 1
+        this.outlinePass.edgeThickness = 2
+        this.outlinePass.visibleEdgeColor.set(0xffffff)
+        this.outlinePass.hiddenEdgeColor.set(0x000000)
+        this.composer.addPass(this.outlinePass)
 
         this.createControls()
         this.container.addEventListener('mousemove', this.onMouseMove, false)
@@ -112,7 +125,6 @@ export class PerspectiveView {
             thloggler()("Exception while evaulating filter:", e) // TODO: output to screen
             this.filterfn=()=>true
         }
-        
         actorview.actor = actor
         actorview.updateMatrix()
     }
@@ -142,6 +154,16 @@ export class PerspectiveView {
         }
     }
 
+    outlinedactorviews() {
+        const retval = []
+        for (let actor of this.actors.values()) {
+            if (this.pointed && this.pointed.actor._monitorbox === actor.actor._monitorbox) {
+                retval.push(actor)
+            }
+        }
+        return retval
+    }
+
     redraw() {
         if (this.parentElement.querySelector("#filter").showedges) {
             this.redrawEdges()
@@ -151,12 +173,14 @@ export class PerspectiveView {
             }
             this.edges.clear()
         }
+        this.outlinePass.selectedObjects = this.outlinedactorviews()
     }
 
     onResize = () => {
         this.camera.aspect = window.innerWidth / window.innerHeight
         this.camera.updateProjectionMatrix()
         this.renderer.setSize(window.innerWidth, window.innerHeight)
+        this.composer.setSize(window.innerWidth, window.innerHeight)
     }
 
     onMouseMove = (event) => {
@@ -272,7 +296,8 @@ export class PerspectiveView {
 
     render() {
         this.highlightPointedObject()
-        this.renderer.render(this.scene, this.camera)
+        //this.renderer.render(this.scene, this.camera)
+        this.composer.render()
         this.updateWatch()
     }
 
