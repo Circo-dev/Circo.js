@@ -27,7 +27,8 @@
   "dependencies": {
     "@ygoe/msgpack": "github:tisztamo/msgpack.js",
     "lit-element": "^2.3.1",
-    "three": "^0.115.0"
+    "three": "^0.115.0",
+    "local-web-server": "4.2.0"
   },
   "@pika/web": {
     "webDependencies": [
