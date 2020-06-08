@@ -7,8 +7,11 @@ import { RenderPass } from "../../web_modules/three/examples/jsm/postprocessing/
 import { OutlinePass } from "../../web_modules/three/examples/jsm/postprocessing/OutlinePass.js"
 import { thloggler } from "../core/util.js"
 import { dist, onpath } from "./helpers/filterlib.js"
+import { getactor } from "./filter.js"
 
 const SELECTED_COLOR = 0x606060
+const INSCHEDULER_EDGE_COLOR = 0xa0a0a0
+const INTERSCHEDULER_EDGE_COLOR = 0xf29507
 
 const defaultdescriptor = {
     geometry: new THREE.BoxBufferGeometry(20, 20, 20),
@@ -50,7 +53,7 @@ export class PerspectiveView {
         parentElement.appendChild(this.container)
 
         this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000)
-        this.camera.position.z = 500
+        this.camera.position.z = 800
 
         this.scene = new THREE.Scene()
         this.scene.background = new THREE.Color(0xd0d0d0)
@@ -120,7 +123,7 @@ export class PerspectiveView {
         try {// TODO find a better place for this
             actorview.visible = this.filterfn ? 
             this.filterfn(actor, this.selected ? this.selected.actor : null, this.pointed ? this.pointed.actor : null,
-                dist, onpath) : true
+                dist, onpath, getactor) : true
         } catch (e) {
             thloggler()("Exception while evaulating filter:", e) // TODO: output to screen
             this.filterfn=()=>true
@@ -142,11 +145,14 @@ export class PerspectiveView {
                     const points = [new THREE.Vector3(source.actor.x, source.actor.y, source.actor.z), new THREE.Vector3(targetactor.x, targetactor.y, targetactor.z)]
                     if (!edge) {
                         const geometry = new THREE.BufferGeometry().setFromPoints( points )
-                        edge = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xa0a0a0 }))
+                        edge = new THREE.Line( geometry, new THREE.LineBasicMaterial( {
+                             color: source.actor._monitorbox === target.actor._monitorbox ? INSCHEDULER_EDGE_COLOR : INTERSCHEDULER_EDGE_COLOR
+                            }))
                         this.scene.add(edge)
                         this.edges.set(box + val, edge)
                     } else {
                         edge.geometry = new THREE.BufferGeometry().setFromPoints( points )
+                        edge.material.color.setHex(source.actor._monitorbox === target.actor._monitorbox ? INSCHEDULER_EDGE_COLOR : INTERSCHEDULER_EDGE_COLOR)
                     }
                     edge.visible = source.visible && target.visible
                 }

@@ -22,7 +22,7 @@ registerActor("Main.SearchTreeTest.TreeNode{UInt32}",  {
     geometry: new THREE.TetrahedronBufferGeometry(10, 2),
     scale: function(actor) {
         if (actor.extra.left) {
-            return { x: 0.2 , y: 0.2, z: 0.2 }
+            return { x: 0.4 , y: 0.5, z: 0.4 }
         } else {
             return { x: 0.2 + actor.extra.size * SPHERESCALE_FACTOR , y: 0.2 + actor.extra.size * SPHERESCALE_FACTOR, z: 0.2 + actor.extra.size * SPHERESCALE_FACTOR }
         }
@@ -39,7 +39,7 @@ registerActor("Main.ClusterFullTest.ListItem{Float64}",  {
 registerActor("CircoCore.MonitorActor{MonitorService}",  {
     geometry: new THREE.BoxBufferGeometry(5, 5, 5),
     scale: actor => {
-        const plussize = actor.extra.actorcount * 0.00004
+        const plussize = actor.extra.actorcount * 0.00002
         // Works only for origo-centered setups:
         return { x: 1 + plussize * Math.abs(actor.y + actor.z), y: 1 + plussize * Math.abs(actor.x + actor.z), z: 1 + plussize * Math.abs(actor.x + actor.y)}
     }

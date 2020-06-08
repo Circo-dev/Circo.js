@@ -18,5 +18,11 @@ export function filterfn(source) {
         return alwaystrue
     } 
     const fullsource = '"use strict";return !!(' + source + ')'
-    return Function("me", "selected", "pointed", "dist", "onpath", fullsource)
+    try {
+        return Function("me", "selected", "pointed", "dist", "onpath", "$", fullsource)
+    } catch (e) {
+        console.error("Error creating filter fn", e)
+        return alwaystrue
+    }
+    
 }

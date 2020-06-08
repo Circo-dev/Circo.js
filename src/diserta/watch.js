@@ -46,7 +46,7 @@ class Watch extends Component {
     return html`
     <div class="container">
       <table>
-        ${Object.entries(this.actor).map( ([attr, value]) => html`
+        ${Object.entries(this.actor).filter(([attr, value]) => attr[0] !== '_').map(([attr, value]) => html`
           <tr>
             <td class="attr">${attr}</td>
             <td>${this.renderValue(attr, value)}</td>

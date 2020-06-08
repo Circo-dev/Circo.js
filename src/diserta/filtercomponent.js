@@ -2,9 +2,11 @@ import {Component} from "./helpers/component.js"
 import {html, css} from "../../../../web_modules/lit-element.js"
 
 const filters = [
-  { label: "coordinator", filter:"/Coordinator/.test(me.typename)"},
+  { label: "coordinators", filter:"/Coordinator/.test(me.typename)"},
   { label: "schedulers", filter:"/MonitorActor/.test(me.typename) || selected && selected.box === me._monitorbox"},
-  { label: "default", filter: "!selected || selected.box == me.box || !selected.typename.match(/TreeNode/) || onpath(me, selected, [/left|right/])  || onpath( selected, me, [/sibling/]) || onpath( selected, me, [/left|right/])"},
+  { label: "walk-out", filter: '!selected || selected.box == me.box || me.typename === "CircoCore.MonitorActor{MonitorService}" || onpath( selected, me, [/root|left|right/], 10)' },
+  { label: "walk-in", filter: '!selected || selected.box == me.box || me.typename === "CircoCore.MonitorActor{MonitorService}" || onpath( me, selected, [/root|left|right/], 10)' },
+  { label: "default(flower)", filter: "!selected || selected.box == me.box || !selected.typename.match(/TreeNode/) || onpath(me, selected, [/left|right/])  ||selected.extra.sibling == me.box || onpath( selected, me, [/left|right/])"},
 ]
 
 class Filter extends Component {
