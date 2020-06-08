@@ -179,7 +179,7 @@ export class PerspectiveView {
             }
             this.edges.clear()
         }
-        this.outlinePass.selectedObjects = this.outlinedactorviews()
+        this.outlinePass.selectedObjects = this.parentElement.querySelector("#filter").glow ? this.outlinedactorviews() : []
     }
 
     onResize = () => {

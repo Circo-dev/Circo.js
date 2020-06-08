@@ -32,7 +32,7 @@ registerActor("Main.SearchTreeTest.TreeNode{UInt32}",  {
     }
 })
 
-registerActor("Main.ClusterFullTest.ListItem{Float64}",  {
+registerActor("Main.LinkedListTest.ListItem{Float64}",  {
     geometry: new THREE.BoxBufferGeometry(10, 10, 10)
 })
 
@@ -50,17 +50,19 @@ registerActor("ClusterActor", nonimportantDescriptor)
 registerActor("EventDispatcher", nonimportantDescriptor)
 
 class Stop {
-    constructor() {
-        this.a=42
-    }
+    constructor() { this.a=42 }
 }
-registerMsg("Main.SearchTreeTest.Stop", Stop)
+registerMsg("CircoCore.Debug.Stop", Stop)
 class Step {
-    constructor() {
-        this.a=42
-    }
+    constructor() { this.a=42 }
 }
-registerMsg("Main.SearchTreeTest.Step", Step)
+registerMsg("CircoCore.Debug.Step", Step)
+
+class Run {
+    constructor() { this.a=42 }
+}
+registerMsg("CircoCore.Debug.Run", Run)
+
 class RunSlow {
     constructor() {
         this.a=42
@@ -73,13 +75,6 @@ class RunFast {
     }
 }
 registerMsg("Main.SearchTreeTest.RunFast", RunFast)
-class RunFull {
-    constructor() {
-        this.a=42
-    }
-}
-registerMsg("Main.SearchTreeTest.RunFull", RunFull)
-
 
 let view = new PerspectiveView()
 
