@@ -2,17 +2,27 @@
 import msgpack from "../../web_modules/@ygoe/msgpack/msgpack.js"
 
 const typeregistry = new Map()
+const registeroptions = Symbol()
 
-export function registerMsg(fulltypename, messagetype) {
+export function registerMsg(fulltypename, messagetype, options={}) {
     if (typeregistry.has(fulltypename)) {
         console.warn(`Overriding registered type '${fulltypename}'`)
     }
     messagetype.typename = fulltypename
-    typeregistry.set(fulltypename, messagetype.prototype)
+    messagetype[registeroptions] = options
+    typeregistry.set(fulltypename, messagetype)
 }
 
 export function createMsg(fulltypename) {
-    return new (typeregistry.get(fulltypename).constructor)()
+    return new (typeregistry.get(fulltypename))()
+}
+
+export function registrationOptions(fulltypename) {
+    const t = typeregistry.get(fulltypename)
+    if (t) {
+        return t[registeroptions]
+    }
+    return {}
 }
 
 export function isRegisteredMsg(fulltypename) {
@@ -62,7 +72,7 @@ export async function unmarshal(messageblob) {
     retval.__proto__ = Msg.prototype
     retval.body.typename = typename    
     if (registeredtype) {
-        retval.body.__proto__ = registeredtype
+        retval.body.__proto__ = registeredtype.prototype
     }
     return retval
 }

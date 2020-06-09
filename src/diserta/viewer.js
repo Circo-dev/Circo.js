@@ -53,7 +53,9 @@ export class PerspectiveView {
         parentElement.appendChild(this.container)
 
         this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000)
-        this.camera.position.z = 800
+        this.camera.position.x = -200
+        this.camera.position.y = 200
+        this.camera.position.z = 1400
 
         this.scene = new THREE.Scene()
         this.scene.background = new THREE.Color(0xd0d0d0)
