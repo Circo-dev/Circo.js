@@ -1,6 +1,6 @@
 import {Component} from "./helpers/component.js"
 import {html, css} from "../../../../web_modules/lit-element.js"
-import { isRegisteredMsg } from "../core/msg.js"
+import { registrationOptions } from "../core/msg.js"
 
 class Watch extends Component {
 
@@ -12,9 +12,18 @@ class Watch extends Component {
 
   static get styles() {
     return css`
-      .container {font-family: "Gill Sans", sans-serif; text-shadow: 1px 1px 2px white; position: absolute; top: 80px;background-color: rgba(240,240,240,0.44)}
+      .container {
+        position: absolute;
+        top: 90px;
+        left: 10px;
+        padding: 5px;
+        font-family: "Gill Sans", sans-serif;
+        text-shadow: 1px 1px 2px white;
+        background-color: rgba(240,240,240,0.44)
+      }
       .attr {text-align: right;padding-right: 10px;font-weight: 700}
       .extraattr {text-align: right; font-style: italic; padding-right: 7px}
+      .command {font-weight: 700}
     `;
   }
 
@@ -46,7 +55,7 @@ class Watch extends Component {
     return html`
     <div class="container">
       <table>
-        ${Object.entries(this.actor).map( ([attr, value]) => html`
+        ${Object.entries(this.actor).filter(([attr, value]) => attr[0] !== '_').map(([attr, value]) => html`
           <tr>
             <td class="attr">${attr}</td>
             <td>${this.renderValue(attr, value)}</td>
@@ -54,9 +63,10 @@ class Watch extends Component {
         `)}
       </table>
       ${this.messagetypes && html`
-        <div>
-          ${this.messagetypes.filter(msgtype => isRegisteredMsg(msgtype.typename)).map(messagetype => html`
-          <span><a href="#" @click=${() => messagetype.send()}>${this.stripPackage(messagetype.typename)}</a> </span>
+        <div class="commands">
+          Commands: 
+          ${this.messagetypes.filter(msgtype => registrationOptions(msgtype.typename).ui).map(messagetype => html`
+          <span class="command"><a href="#" @click=${() => messagetype.send()}>${this.stripPackage(messagetype.typename)}</a> </span>
           `)}
         </div>
       `}

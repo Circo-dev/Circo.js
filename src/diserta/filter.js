@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
 const actormap = new Map()
-export function setactors(actors) {
-    actormap.clear()
+export function setactors(monitor, actors) {
+    // TODO periodically remove inactive (dead) actors
     for (var actor of actors) {
         actormap.set(actor.box, actor)
     }
@@ -17,6 +17,12 @@ export function filterfn(source) {
     if (source === "") {
         return alwaystrue
     } 
-    const fullsource = '"use strict";return (' + source + ')'
-    return Function("me", "selected", "pointed", "dist", "onpath", fullsource)
+    const fullsource = '"use strict";return !!(' + source + ')'
+    try {
+        return Function("me", "selected", "pointed", "dist", "onpath", "$", fullsource)
+    } catch (e) {
+        console.error("Error creating filter fn", e)
+        return alwaystrue
+    }
+    
 }
