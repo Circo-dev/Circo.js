@@ -53,7 +53,7 @@ export class PerspectiveView {
         parentElement.appendChild(this.container)
 
         this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000)
-        this.camera.position.x = -200
+        this.camera.position.x = -400
         this.camera.position.y = 200
         this.camera.position.z = 1400
 
@@ -148,6 +148,7 @@ export class PerspectiveView {
                     if (!edge) {
                         const geometry = new THREE.BufferGeometry().setFromPoints( points )
                         edge = new THREE.Line( geometry, new THREE.LineBasicMaterial( {
+                            linewidth: 2,
                              color: source.actor._monitorbox === target.actor._monitorbox ? INSCHEDULER_EDGE_COLOR : INTERSCHEDULER_EDGE_COLOR
                             }))
                         this.scene.add(edge)
