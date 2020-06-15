@@ -5,6 +5,7 @@ import { RegisteredActor } from "../core/actor.js"
 import { ActorRequest, ActorResponse } from "../core/token.js"
 import { setactors } from "./filter.js"
 import { Addr, MASTERPOSTCODE } from "../core/postoffice.js"
+import { registerActor } from "./viewer.js"
 
 class ActorListRequest extends ActorRequest {
     constructor(respondto) {
@@ -20,6 +21,22 @@ class ActorListResponse extends ActorResponse {
     }
 }
 registerMsg("CircoCore.ActorListResponse", ActorListResponse)
+
+class MonitorProjectionRequest extends ActorRequest {
+    constructor(respondto, typename) {
+        super()
+        this.respondto = respondto
+        this.typename = typename
+    }
+}
+registerMsg("CircoCore.MonitorProjectionRequest", MonitorProjectionRequest)
+
+class MonitorProjectionResponse extends ActorResponse {
+    constructor(projection) {
+        this.projection = projection
+    }
+}
+registerMsg("CircoCore.MonitorProjectionResponse", MonitorProjectionResponse)
 
 class ActorInterfaceRequest extends ActorRequest {
     constructor(respondto, box) {
@@ -37,7 +54,7 @@ class ActorInterfaceResponse extends ActorResponse {
 }
 registerMsg("CircoCore.ActorInterfaceResponse", ActorInterfaceResponse)
 
-const monitor = Symbol("monitor")
+const monitor = Symbol.for("monitor")
 
 export class MonitorClient extends RegisteredActor {
     constructor() {
@@ -99,5 +116,12 @@ export class MonitorClient extends RegisteredActor {
         if (actorinfo[monitor] === this) {
             this.requestActorInterface(actorinfo.box)
         }
+    }
+
+    requestMonitorProjection(typename) {
+        this.service.send(this.monitoraddr, new MonitorProjectionRequest(this.address, typename))
+        .then(response => {
+            registerActor(typename, response.projection.src)
+        })
     }
 }
