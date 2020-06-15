@@ -9,46 +9,6 @@ import { filterfn } from "./filter.js"
 import "./filtercomponent.js"
 import { registerMsg } from "../core/msg.js"
 
-const ITEMS_PER_NODE = 1000
-const RED_AFTER = ITEMS_PER_NODE * 0.95 - 1
-const SPHERESCALE_FACTOR = 1 / ITEMS_PER_NODE / 2
-
-const nonimportantDescriptor = {
-    geometry: new THREE.TetrahedronBufferGeometry(4, 0),
-    color: 0xa0a0a0
-}
-
-registerActor("Main.SearchTreeTest.TreeNode{UInt32}",  {
-    geometry: new THREE.TetrahedronBufferGeometry(10, 2),
-    scale: function(actor) {
-        if (actor.extra.left) {
-            return { x: 0.4 , y: 0.5, z: 0.4 }
-        } else {
-            return { x: 0.2 + actor.extra.size * SPHERESCALE_FACTOR , y: 0.2 + actor.extra.size * SPHERESCALE_FACTOR, z: 0.2 + actor.extra.size * SPHERESCALE_FACTOR }
-        }
-    },
-    color: function(actor) {
-        return actor.extra.size < RED_AFTER ? 0x389826 : (actor.extra.left ? 0x9558b2 : 0xcb3c33)
-    }
-})
-
-registerActor("Main.LinkedListTest.ListItem{Float64}",  {
-    geometry: new THREE.BoxBufferGeometry(10, 10, 10)
-})
-
-registerActor("CircoCore.MonitorActor{MonitorService}",  {
-    geometry: new THREE.BoxBufferGeometry(5, 5, 5),
-    scale: actor => {
-        const plussize = actor.extra.actorcount * 0.00002
-        // Works only for origo-centered setups:
-        return { x: 1 + plussize * Math.abs(actor.y + actor.z), y: 1 + plussize * Math.abs(actor.x + actor.z), z: 1 + plussize * Math.abs(actor.x + actor.y)}
-    }
-})
-
-registerActor("CircoCore.MigrationHelper", nonimportantDescriptor)
-registerActor("ClusterActor", nonimportantDescriptor)
-registerActor("EventDispatcher", nonimportantDescriptor)
-
 class Stop {
     constructor() { this.a=42 }
 }

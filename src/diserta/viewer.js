@@ -13,17 +13,32 @@ const SELECTED_COLOR = 0x606060
 const INSCHEDULER_EDGE_COLOR = 0xa0a0a0
 const INTERSCHEDULER_EDGE_COLOR = 0xf29507
 
-const defaultdescriptor = {
-    geometry: new THREE.BoxBufferGeometry(20, 20, 20),
-    scale: { x: 1, y: 1, z: 1 },
-    rotation: { x: 0, y: 0, z: 0 }
+const projections = {
+    default: {
+        geometry: new THREE.BoxBufferGeometry(20, 5, 5),
+        scale: { x: 1, y: 1, z: 1 },
+        rotation: { x: 0, y: 0, z: 0 }
+    },
+    nonimportant: {
+        geometry: new THREE.TetrahedronBufferGeometry(4, 0),
+        color: 0xa0a0a0
+    }
 }
+
 const actortypes = new Map()
 
 export function registerActor(typeName, descriptor) {
     if (descriptor instanceof THREE.BufferGeometry || descriptor instanceof THREE.Geometry) {
         descriptor = {
             geometry: descriptor
+        }
+    }
+    if (typeof descriptor == "string") {
+        try {
+            descriptor = eval("(" + descriptor + ")")
+        } catch (e) {
+            console.error(`Cannot evaluate descriptor: ${descriptor} \n`, e)
+            descriptor = projections.default
         }
     }
     actortypes.set(typeName, descriptor)
@@ -92,9 +107,24 @@ export class PerspectiveView {
         window.addEventListener('resize', this.onResize, false)
     }
 
+    loadDescriptor(actor) {
+        const typename = actor.typename
+        if (!this.loadedDescriptors) {
+            this.loadedDescriptors = new Set()
+        }
+        if (!this.loadedDescriptors.has(typename)) {
+            actor[Symbol.for("monitor")].requestMonitorProjection(typename)
+            this.loadedDescriptors.add(typename)
+        }
+    }
+
     putActor(actor) {
         let actorview = this.actors.get(actor.box)
-        const descriptor = actortypes.get(actor.typename) || defaultdescriptor
+        const descriptor = actortypes.get(actor.typename)
+        if (!descriptor) {
+            this.loadDescriptor(actor)
+            return
+        }
         if (!actorview) {
             actorview = new THREE.Mesh(descriptor.geometry, new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff }))
             actorview.matrixAutoUpdate = false;
