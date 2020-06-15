@@ -7,6 +7,7 @@ import { PerspectiveView, registerActor } from "./viewer.js"
 import "./watch.js"
 import { filterfn } from "./filter.js"
 import "./filtercomponent.js"
+import "./statuscomponent.js"
 import { registerMsg } from "../core/msg.js"
 
 class Stop {
@@ -65,6 +66,7 @@ async function start() {
             const {monitor, scheduler} = await createmonitor(view, port)
             schedulers.push(scheduler)
             port = port + 1
+            document.getElementById("status").schedulercount = schedulers.length
         }
     } catch (e) {
         if (!schedulers.length) {
