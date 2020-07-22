@@ -32,6 +32,8 @@ function onpathimpl(actor1, actor2, path, limit, step) {// TODO speed up circula
     return false
 }
 
+const MAX_LIMIT = 100
+
 export function onpath(actor1, actor2, path=[/.*/], limit=8) {// TODO speed up circular references
     if (typeof actor1 !== "object" || !actor1.box) {
         throw new FilterError("First argument provided is not an actor: " + actor1)
@@ -46,8 +48,8 @@ export function onpath(actor1, actor2, path=[/.*/], limit=8) {// TODO speed up c
             throw new FilterError("Path must be a single RegExp or an array of them. Got " + path)
         }
     }
-    if (limit < 0 || limit > 18) {
-        throw new FilterError("Invalid limit (must be nonnegative, max 18): " + limit)
+    if (limit < 0 || limit > MAX_LIMIT) {
+        throw new FilterError("Invalid limit (must be nonnegative, max ${MAX_LIMIT}): " + limit)
     }
     return onpathimpl(actor1, actor2, path, limit, 0)
 }

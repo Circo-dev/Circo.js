@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { registerMsg, createMsg } from "../core/msg.js"
+import { registerMsg, isRegisteredMsg, createMsg } from "../core/msg.js"
 import { RegisteredActor } from "../core/actor.js"
 import { ActorRequest, ActorResponse } from "../core/token.js"
 import { setactors } from "./filter.js"
@@ -99,14 +99,24 @@ export class MonitorClient extends RegisteredActor {
         this.view.redraw()
     }
 
+    registerTypes(msgtypes) {
+        for (var msgtype of msgtypes) {
+            if (!isRegisteredMsg(msgtype.typename)) {
+                let registratorfn = Function("registerMsg", msgtype.registrator_snippet.src)
+                registratorfn(registerMsg)    
+            }
+        }
+    }
+
     requestActorInterface(addr) {
         this.service.send(this.monitoraddr, new ActorInterfaceRequest(this.address, addr))
         .then(response => {
+            this.registerTypes(response.messagetypes)
             this.view.setActorInterface({
                 box: response.box,
-                messagetypes: response.messagetypes.map(typename => { return {
-                    typename,
-                    send: () => this.service.send(new Addr(MASTERPOSTCODE, response.box), createMsg(typename))
+                messagetypes: response.messagetypes.map(msgtype => { return {
+                    send: () => this.service.send(new Addr(MASTERPOSTCODE, response.box), createMsg(msgtype.typename)),
+                    ...msgtype
                 }})
             })
         })

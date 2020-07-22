@@ -316,9 +316,9 @@ export class PerspectiveView {
         }
     }
 
-    setActorInterface(actorInterfaceResponse) {
-        if (this.selected && this.selected.actor.box === actorInterfaceResponse.box) {
-            this.selected.messagetypes = actorInterfaceResponse.messagetypes
+    setActorInterface(actorInterface) {
+        if (this.selected && this.selected.actor.box === actorInterface.box) {
+            this.selected.messagetypes = actorInterface.messagetypes
         }
     }
 

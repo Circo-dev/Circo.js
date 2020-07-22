@@ -8,34 +8,6 @@ import "./watch.js"
 import { filterfn } from "./filter.js"
 import "./filtercomponent.js"
 import "./statuscomponent.js"
-import { registerMsg } from "../core/msg.js"
-
-class Stop {
-    constructor() { this.a=42 }
-}
-registerMsg("CircoCore.Debug.Stop", Stop, { ui: true })
-class Step {
-    constructor() { this.a=42 }
-}
-registerMsg("CircoCore.Debug.Step", Step, { ui: true })
-
-class Run {
-    constructor() { this.a=42 }
-}
-registerMsg("CircoCore.Debug.Run", Run, { ui: true })
-
-class RunSlow {
-    constructor() {
-        this.a=42
-    }
-}
-registerMsg("Main.SearchTreeTest.RunSlow", RunSlow, { ui: true })
-class RunFast {
-    constructor() {
-        this.a=42
-    }
-}
-registerMsg("Main.SearchTreeTest.RunFast", RunFast, { ui: true })
 
 let view = new PerspectiveView()
 
