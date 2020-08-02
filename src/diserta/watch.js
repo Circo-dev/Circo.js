@@ -20,6 +20,8 @@ class Watch extends Component {
         font-family: "Gill Sans", sans-serif;
         text-shadow: 1px 1px 2px white;
         background-color: rgba(240,240,240,0.44)
+        overflow-y: scroll;
+        max-height: 400px;
       }
       .attr {text-align: right;padding-right: 10px;font-weight: 700}
       .extraattr {text-align: right; font-style: italic; padding-right: 7px}
@@ -44,18 +46,30 @@ class Watch extends Component {
   }
 
   renderValue(attr, value) {
-    if (attr === "x" || attr === "y" || attr === "z") {
-      return Math.round(value * 100) / 100
-    }
     return typeof(value) === "object" ? this.renderObject(value) : value
   }
 
+  hasSpecialDisplay(attrname) {
+    return ["x", "y", "z"].indexOf(attrname) >= 0
+  }
+
+  formatCoords() {
+    function formatCoord(value) {
+      return Math.round(value * 100) / 100
+    }
+    return `${formatCoord(this.actor.x)}, ${formatCoord(this.actor.y)}, ${formatCoord(this.actor.z)}`
+  }
+  
   render() {
     if (!this.actor) return null
     return html`
     <div class="container">
       <table>
-        ${Object.entries(this.actor).filter(([attr, value]) => attr[0] !== '_').map(([attr, value]) => html`
+        <tr>
+        <td class="attr">Coordinates</td>
+            <td>${this.formatCoords()}</td>
+        </tr>
+        ${Object.entries(this.actor).filter(([attr, value]) => attr[0] !== '_' && !this.hasSpecialDisplay(attr)).map(([attr, value]) => html`
           <tr>
             <td class="attr">${attr}</td>
             <td>${this.renderValue(attr, value)}</td>
