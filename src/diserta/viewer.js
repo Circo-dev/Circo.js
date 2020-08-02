@@ -51,7 +51,7 @@ export class PerspectiveView {
         this.filterfn = null
         this.mousepos = new THREE.Vector2()
         this.downpos = new THREE.Vector2(-1, -1)
-        this.actors = new Map()
+        this.actorviews = new Map()
         this.edges = new Map()
         this.pointed = null
         this.selected = null
@@ -119,7 +119,7 @@ export class PerspectiveView {
     }
 
     putActor(actor) {
-        let actorview = this.actors.get(actor.box)
+        let actorview = this.actorviews.get(actor.box)
         const descriptor = actortypes.get(actor.typename)
         if (!descriptor) {
             this.loadDescriptor(actor)
@@ -129,7 +129,7 @@ export class PerspectiveView {
             actorview = new THREE.Mesh(descriptor.geometry, new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff }))
             actorview.matrixAutoUpdate = false;
             this.scene.add(actorview)
-            this.actors.set(actor.box, actorview)
+            this.actorviews.set(actor.box, actorview)
         }
         if (descriptor.position) {
             const pos = typeof descriptor.position === "function" ? descriptor.position(actor) : descriptor.position
@@ -165,8 +165,8 @@ export class PerspectiveView {
     }
 
     redrawEdges() {
-        const actors = this.actors
-        for (var source of this.actors.values()) {
+        const actors = this.actorviews
+        for (var source of this.actorviews.values()) {
             if (!source.actor.extra) return
             const box = source.actor.box
             for (var val of Object.values(source.actor.extra)) {
@@ -195,7 +195,7 @@ export class PerspectiveView {
 
     outlinedactorviews() {
         const retval = []
-        for (let actor of this.actors.values()) {
+        for (let actor of this.actorviews.values()) {
             if (this.pointed && this.pointed.actor._monitorbox === actor.actor._monitorbox) {
                 retval.push(actor)
             }
@@ -324,18 +324,13 @@ export class PerspectiveView {
 
     updateWatch() {
         const target = document.getElementById("watch")
-        if (this.selected) {
-             target.actor = this.selected.actor
-             target.messagetypes = this.selected.messagetypes
-        } else {
-            target.actor = this.pointed ? this.pointed.actor : null
-            target.messagetypes = null
-        }
+        target.selectedactor = this.selected ? this.selected.actor : null
+        target.pointedactor = this.pointed ? this.pointed.actor : null
+        target.actorviews = this.actorviews
     }
 
     render() {
         this.highlightPointedObject()
-        //this.renderer.render(this.scene, this.camera)
         this.composer.render()
         this.updateWatch()
     }

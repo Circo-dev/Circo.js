@@ -1,91 +1,81 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+import "./watchitem.js"
 import {Component} from "./helpers/component.js"
 import {html, css} from "../../../../web_modules/lit-element.js"
-import { registrationOptions } from "../core/msg.js"
 
 class Watch extends Component {
 
   static get properties() {
     return {
-      actor: { type: Object }
+      selectedactor: { type: Object, attribute: false },
+      pointedactor: { type: Object, attribute: false },
+      actorviews: { type: Object, attribute: false} // box -> actorview beacuse viewer already had that, but box -> actor + messagetypes would be enough
     }
   }
 
   static get styles() {
     return css`
-      .container {
+      .maincontainer {
         position: absolute;
         top: 90px;
         left: 10px;
         padding: 5px;
         font-family: "Gill Sans", sans-serif;
         text-shadow: 1px 1px 2px white;
-        background-color: rgba(240,240,240,0.44)
+        background-color: rgba(240,240,240,0.44);
         overflow-y: scroll;
         max-height: 400px;
       }
-      .attr {text-align: right;padding-right: 10px;font-weight: 700}
-      .extraattr {text-align: right; font-style: italic; padding-right: 7px}
-      .command {font-weight: 700}
+      .pinnedcontainer {
+        position: absolute;
+        bottom: 0px;
+        left: 10px;
+        padding: 5px;
+        font-family: "Gill Sans", sans-serif;
+        text-shadow: 1px 1px 2px white;
+        background-color: rgba(240,240,240,0.44);
+        overflow-y: scroll;
+        max-height: calc(100vh - 520px);
+      }
     `;
   }
 
   constructor() {
     super()
-  }
-
-  renderObject(obj) {
-    return html`
-      <table>
-        ${Object.entries(obj).map( ([name, value]) => value ? html`<tr><td class="extraattr">${name}</ts><td>${value}</td></tr>` : null)}
-      </table>
-     `
-  }
-
-  stripPackage(typename) {
-    return typename.substr(typename.lastIndexOf(".") + 1)
-  }
-
-  renderValue(attr, value) {
-    return typeof(value) === "object" ? this.renderObject(value) : value
-  }
-
-  hasSpecialDisplay(attrname) {
-    return ["x", "y", "z"].indexOf(attrname) >= 0
-  }
-
-  formatCoords() {
-    function formatCoord(value) {
-      return Math.round(value * 100) / 100
-    }
-    return `${formatCoord(this.actor.x)}, ${formatCoord(this.actor.y)}, ${formatCoord(this.actor.z)}`
+    this.selectedactor = null
+    this.pointedactor = null
+    this.actormap = null
+    this.pinnedboxes = []
   }
   
+  onpin = (e) => {
+      this.onunpin(e)
+      this.pinnedboxes.push(e.target.actor.box)
+      this.requestUpdate()
+  }
+
+  onunpin = (e) => {
+    this.pinnedboxes = this.pinnedboxes.filter(box => box !== e.target.actor.box)
+    this.requestUpdate()
+  }
+
+  renderpinned = (box) => {
+    const actorview = this.actorviews && this.actorviews.get(box)
+    if (!actorview || !actorview.actor) return html`<div>Cannot find pinned actor: ${box}</div>`
+    return html`<actor-watch-item unpinnable=true .messagetypes=${actorview.messagetypes} .actor=${actorview.actor} @unpin=${this.onunpin}>></actor-watch-item>`
+  }
+
   render() {
-    if (!this.actor) return null
+    const mainactor = this.selectedactor || this.pointedactor
+    const mainactorview = mainactor && this.actorviews && this.actorviews.get(mainactor.box)
     return html`
-    <div class="container">
-      <table>
-        <tr>
-        <td class="attr">Coordinates</td>
-            <td>${this.formatCoords()}</td>
-        </tr>
-        ${Object.entries(this.actor).filter(([attr, value]) => attr[0] !== '_' && !this.hasSpecialDisplay(attr)).map(([attr, value]) => html`
-          <tr>
-            <td class="attr">${attr}</td>
-            <td>${this.renderValue(attr, value)}</td>
-          </tr>
-        `)}
-      </table>
-      ${this.messagetypes && html`
-        <div class="commands">
-          Commands: 
-          ${this.messagetypes.filter(msgtype => registrationOptions(msgtype.typename).ui).map(messagetype => html`
-          <span class="command"><a href="#" @click=${() => messagetype.send()}>${this.stripPackage(messagetype.typename)}</a> </span>
-          `)}
-        </div>
-      `}
-    </div>
-`
+      ${mainactorview ? html`<div class="maincontainer">
+      <actor-watch-item pinnable=true .messagetypes=${mainactorview.messagetypes} .actor=${mainactor} @pin=${this.onpin}></actor-watch-item>
+      </div>` : ""}
+      ${this.pinnedboxes.length ? html`
+      <div class="pinnedcontainer">
+        ${this.pinnedboxes.map(this.renderpinned)}
+      </div>` : ""}`
   }
 }
 
