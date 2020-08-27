@@ -5,11 +5,11 @@ export class PeerListRequest {
         this.respondto = respondto
     }
 }
-registerMsg("CircoCore.PeerListRequest", PeerListRequest)
+registerMsg("Circo.PeerListRequest", PeerListRequest)
 
 export class PeerListResponse {
     constructor(peers) {
         this.peers = peers
     }
 }
-registerMsg("CircoCore.PeerListResponse", PeerListResponse)
+registerMsg("Circo.PeerListResponse", PeerListResponse)

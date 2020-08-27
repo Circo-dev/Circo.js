@@ -5,8 +5,8 @@ const filters = [
   { label: "all", filter:"true"},
   { label: "coordinators", filter:"/Coordinator/.test(me.typename)"},
   { label: "schedulers", filter:"/MonitorActor/.test(me.typename) || selected && selected.box === me._monitorbox"},
-  { label: "tree:walk-out", filter: '!selected || selected.box == me.box || me.typename === "CircoCore.MonitorActor{MonitorService}" || onpath( selected, me, [/root|left|right/], 10)' },
-  { label: "tree:walk-in", filter: '!selected || selected.box == me.box || me.typename === "CircoCore.MonitorActor{MonitorService}" || onpath( me, selected, [/root|left|right/], 10)' },
+  { label: "tree:walk-out", filter: '!selected || selected.box == me.box || me.typename === "Circo.MonitorActor{MonitorService}" || onpath( selected, me, [/root|left|right/], 10)' },
+  { label: "tree:walk-in", filter: '!selected || selected.box == me.box || me.typename === "Circo.MonitorActor{MonitorService}" || onpath( me, selected, [/root|left|right/], 10)' },
   { label: "tree:flower", filter: "!selected || selected.box == me.box || !selected.typename.match(/TreeNode/) || onpath(me, selected, [/left|right/])  ||selected.extra.sibling == me.box || onpath( selected, me, [/left|right/])"},
 ]
 

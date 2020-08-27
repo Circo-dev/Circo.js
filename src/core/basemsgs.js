@@ -8,7 +8,7 @@ export class RegistrationRequest {
         this.actoraddr = actoraddr
     }
 }
-registerMsg("CircoCore.RegistrationRequest", RegistrationRequest)
+registerMsg("Circo.RegistrationRequest", RegistrationRequest)
 
 export class Registered {
     constructor(actoraddr, accepted) {
@@ -16,7 +16,7 @@ export class Registered {
         this.accepted = accepted
     }
 }
-registerMsg("CircoCore.Registered", Registered)
+registerMsg("Circo.Registered", Registered)
 
 export class NameQuery extends ActorRequest {
     constructor(name) {
@@ -24,7 +24,7 @@ export class NameQuery extends ActorRequest {
         this.name = name
     }
 }
-registerMsg("CircoCore.NameQuery", NameQuery)
+registerMsg("Circo.NameQuery", NameQuery)
 
 export class NameResponse extends ActorResponse {
     constructor(query, handler) {
@@ -32,5 +32,5 @@ export class NameResponse extends ActorResponse {
         this.handler = handler
     }
 }
-registerMsg("CircoCore.NameResponse", NameResponse)
+registerMsg("Circo.NameResponse", NameResponse)
     

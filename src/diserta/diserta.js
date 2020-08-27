@@ -34,7 +34,7 @@ async function start() {
     const schedulers = []
     try {
         let port = 2497
-        while (true) {
+        while (port < 3200) {
             const {monitor, scheduler} = await createmonitor(view, port)
             schedulers.push(scheduler)
             port = port + 1
