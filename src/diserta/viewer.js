@@ -20,8 +20,7 @@ const projections = {
         rotation: { x: 0, y: 0, z: 0 }
     },
     nonimportant: {
-        geometry: new THREE.TetrahedronBufferGeometry(4, 0),
-        color: 0xa0a0a0
+        geometry: new THREE.Geometry(),
     }
 }
 
@@ -67,7 +66,7 @@ export class PerspectiveView {
         this.container.tabIndex = 0
         parentElement.appendChild(this.container)
 
-        this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000)
+        this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000000)
         this.camera.position.x = -400
         this.camera.position.y = 200
         this.camera.position.z = 1400
