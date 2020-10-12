@@ -1,6 +1,6 @@
 # Circo.js
 
-An actor model in the browser, aka the frontend of Circo.
+An actor model in the browser, aka the frontend of [Circo](https://github.com/Circo-dev/Circo).
 
 Circo.js allows executing Circo-compatible actors in the browser. It connects to the Circo cluster through websockets and integrates with it semi-transparently, meaning that Circo.js actors are scheduled in the JavaScript engine but they can register themselves in the cluster to become full-featured Circo actors.
 
