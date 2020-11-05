@@ -2,6 +2,7 @@
 
 import * as THREE from "../../web_modules/three/build/three.module.js"
 import { TrackballControls } from "../../web_modules/three/examples/jsm/controls/TrackballControls.js"
+import { OrbitControls } from "../../web_modules/three/examples/jsm/controls/OrbitControls.js"
 import { EffectComposer } from "../../web_modules/three/examples/jsm/postprocessing/EffectComposer.js"
 import { RenderPass } from "../../web_modules/three/examples/jsm/postprocessing/RenderPass.js"
 import { OutlinePass } from "../../web_modules/three/examples/jsm/postprocessing/OutlinePass.js"
@@ -9,6 +10,7 @@ import { thloggler } from "../core/util.js"
 import { dist, onpath } from "./helpers/filterlib.js"
 import { getactor } from "./filter.js"
 
+const AUTO_ROTATE = false
 const SELECTED_COLOR = 0x606060
 const INSCHEDULER_EDGE_COLOR = 0xa0a0a0
 const INTERSCHEDULER_EDGE_COLOR = 0xf29507
@@ -335,7 +337,13 @@ export class PerspectiveView {
     }
 
     createControls() {
-        this.controls = new TrackballControls(this.camera, this.renderer.domElement)
+        if (AUTO_ROTATE) {
+            this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+            this.controls.autoRotate = true
+            this.controls.autoRotateSpeed = 0.4
+        } else {
+            this.controls = new TrackballControls(this.camera, this.renderer.domElement)
+        }
         this.controls.rotateSpeed = 2.0
         this.controls.zoomSpeed = 3.2
         this.controls.panSpeed = 1.0

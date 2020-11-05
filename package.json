@@ -27,15 +27,16 @@
   },
   "dependencies": {
     "@ygoe/msgpack": "github:tisztamo/msgpack.js",
-    "lit-element": "^2.3.1",
-    "three": "^0.115.0",
-    "local-web-server": "4.2.0"
+    "lit-element": "^2.4.0",
+    "local-web-server": "4.2.0",
+    "three": "^0.115.0"
   },
   "@pika/web": {
     "webDependencies": [
       "lit-element",
       "three/build/three.module.js",
       "three/examples/jsm/controls/TrackballControls.js",
+      "three/examples/jsm/controls/OrbitControls.js",
       "three/examples/jsm/postprocessing/OutlinePass.js",
       "three/examples/jsm/postprocessing/RenderPass.js",
       "three/examples/jsm/postprocessing/EffectComposer.js",
