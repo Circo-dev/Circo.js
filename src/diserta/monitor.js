@@ -13,14 +13,14 @@ class ActorListRequest extends ActorRequest {
         this.respondto = respondto
     }
 }
-registerMsg("Circo.ActorListRequest", ActorListRequest)
+registerMsg("Circo.Monitor.ActorListRequest", ActorListRequest)
 
 class ActorListResponse extends ActorResponse {
     constructor(actors) {
         this.actors = actors
     }
 }
-registerMsg("Circo.ActorListResponse", ActorListResponse)
+registerMsg("Circo.Monitor.ActorListResponse", ActorListResponse)
 
 class MonitorProjectionRequest extends ActorRequest {
     constructor(respondto, typename) {
@@ -29,14 +29,14 @@ class MonitorProjectionRequest extends ActorRequest {
         this.typename = typename
     }
 }
-registerMsg("Circo.MonitorProjectionRequest", MonitorProjectionRequest)
+registerMsg("Circo.Monitor.MonitorProjectionRequest", MonitorProjectionRequest)
 
 class MonitorProjectionResponse extends ActorResponse {
     constructor(projection) {
         this.projection = projection
     }
 }
-registerMsg("Circo.MonitorProjectionResponse", MonitorProjectionResponse)
+registerMsg("Circo.Monitor.MonitorProjectionResponse", MonitorProjectionResponse)
 
 class ActorInterfaceRequest extends ActorRequest {
     constructor(respondto, box) {
@@ -45,14 +45,14 @@ class ActorInterfaceRequest extends ActorRequest {
         this.box = box
     }
 }
-registerMsg("Circo.ActorInterfaceRequest", ActorInterfaceRequest)
+registerMsg("Circo.Monitor.ActorInterfaceRequest", ActorInterfaceRequest)
 
 class ActorInterfaceResponse extends ActorResponse {
     constructor(messagetypes) {
         this.messagetypes = messagetypes
     }
 }
-registerMsg("Circo.ActorInterfaceResponse", ActorInterfaceResponse)
+registerMsg("Circo.Monitor.ActorInterfaceResponse", ActorInterfaceResponse)
 
 const monitor = Symbol.for("monitor")
 

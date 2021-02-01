@@ -8,7 +8,7 @@ export class RegistrationRequest {
         this.actoraddr = actoraddr
     }
 }
-registerMsg("Circo.RegistrationRequest", RegistrationRequest)
+registerMsg("Circo.WebSocket.RegistrationRequest", RegistrationRequest)
 
 export class Registered {
     constructor(actoraddr, accepted) {
@@ -16,7 +16,7 @@ export class Registered {
         this.accepted = accepted
     }
 }
-registerMsg("Circo.Registered", Registered)
+registerMsg("Circo.WebSocket.Registered", Registered)
 
 export class NameQuery extends ActorRequest {
     constructor(name) {
@@ -24,7 +24,7 @@ export class NameQuery extends ActorRequest {
         this.name = name
     }
 }
-registerMsg("Circo.NameQuery", NameQuery)
+registerMsg("CircoCore.Registry.NameQuery", NameQuery)
 
 export class NameResponse extends ActorResponse {
     constructor(query, handler) {
@@ -32,5 +32,5 @@ export class NameResponse extends ActorResponse {
         this.handler = handler
     }
 }
-registerMsg("Circo.NameResponse", NameResponse)
+registerMsg("CircoCore.Registry.NameResponse", NameResponse)
     
