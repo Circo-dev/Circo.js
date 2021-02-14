@@ -37,7 +37,7 @@ export class Msg {
     }
 
     marshal() {
-        const header = `Msg{${this.body.constructor.typename || this.body.constructor.name}}\n`
+        const header = `{${this.body.constructor.typename || this.body.constructor.name}}\n`
         const headerBytes = encoder.encode(header)
         const msgBytes = msgpack.serialize(this)
         const buf = new Uint8Array(headerBytes.length + msgBytes.length + 1)
@@ -53,7 +53,7 @@ export class Msg {
 
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
-const parser = /Msg{([\w.]+)}/
+const parser = /Msg[\w]+{([\w.]+)}/
 
 export async function unmarshal(messageblob) {
     const buf = await messageblob.arrayBuffer()
