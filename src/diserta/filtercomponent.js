@@ -14,7 +14,6 @@ class Filter extends Component {
   static get properties() {
     return {
       actorfilter: { type: String },
-      showedges: { type: Boolean },
       glow: { type: Boolean }
     }
   }
@@ -31,7 +30,6 @@ class Filter extends Component {
 
   constructor() {
     super()
-    this.showedges = false
     this.glow = false
     this.editedtext = localStorage.getItem("editedfilter")
   }
@@ -53,11 +51,6 @@ class Filter extends Component {
     this.setactorfilter(e.target.value)
   }
 
-  handleShowedges = e => {
-    this.showedges = e.target.checked
-    this.dispatchEvent(new CustomEvent('showedgeschanged', { detail: { value: this.showedges }, bubbles: true, composed: true }));
-  }
-
   handleGlow = e => {
     this.glow = e.target.checked
     this.dispatchEvent(new CustomEvent('glowchanged', { detail: { value: this.glow }, bubbles: true, composed: true }));
@@ -73,18 +66,20 @@ class Filter extends Component {
   render() {
     return html`
     <div class="container">
-      <div>
-        <input class="filterinput" type="text" placeholder="Filter" @input=${this.handleinput} .value="${this.actorfilter}"></input>
+      <details open="true">
+        <summary>Actors</summary>
+        <div class="options">
+          <input id="glow" type="checkbox" ?checked=${this.glow} @click=${this.handleGlow}></input><label for="glow">Glow pointed scheduler (slow)</label>
+        </div>
         <div>
-          ${filters.map(({label, filter}) => html`<a class="filler ${filter === this.actorfilter ? 'activefiller': ''}" href="" @click=${this.inputfiller(filter)}>${label}</a>`)}
-          ${this.editedtext && html`<a class="filler ${this.actorfilter === this.editedtext ? 'activefiller': ''}" href="" @click=${this.inputfiller(this.editedtext)}>edited</a>`}
+          <input class="filterinput" type="text" placeholder="Filter" @input=${this.handleinput} .value="${this.actorfilter}"></input>
+          <div>
+            ${filters.map(({label, filter}) => html`<a class="filler ${filter === this.actorfilter ? 'activefiller': ''}" href="" @click=${this.inputfiller(filter)}>${label}</a>`)}
+            ${this.editedtext && html`<a class="filler ${this.actorfilter === this.editedtext ? 'activefiller': ''}" href="" @click=${this.inputfiller(this.editedtext)}>edited</a>`}
+          </div>
         </div>
       </div>
-      <div class="options">
-        <input id="showedges" type="checkbox" ?checked=${this.showedges} @click=${this.handleShowedges}></input><label for="showedges">Edges (slow)</label>
-        <input id="glow" type="checkbox" ?checked=${this.glow} @click=${this.handleGlow}></input><label for="glow">Glow pointed scheduler (slow)</label>
-      </div>
-    </div>
+    </details>
 `
   }
 }

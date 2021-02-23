@@ -7,17 +7,20 @@ import { PerspectiveView, registerActor } from "./viewer.js"
 import "./watch.js"
 import { filterfn } from "./filter.js"
 import "./filtercomponent.js"
+import "./edgecontrolcomponent.js"
 import "./statuscomponent.js"
 
 let view = new PerspectiveView()
 
-function updatefilter(newvalue) {
-    view.setfilter(filterfn(newvalue))
-}
-
 function initfilter() {
     document.getElementById("filter").addEventListener("filterinput", e => {
-        updatefilter(e.detail.value)
+        view.setfilter(filterfn(e.detail.value, ["me", "selected", "pointed", "dist", "onpath", "$"]))
+    })
+}
+
+function initedgecontrol() {
+    document.getElementById("edgecontrol").addEventListener("edgefilterinput", e => {
+        view.setedgefilter(filterfn(e.detail.value,["src", "dst", "edge", "srcvisible", "dstvisible"]))
     })
 }
 
@@ -31,6 +34,7 @@ async function createmonitor(view, port) {
 
 async function start() {
     initfilter()
+    initedgecontrol()
     const schedulers = []
     try {
         let port = 2497

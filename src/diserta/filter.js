@@ -13,13 +13,13 @@ export function getactor(actorid) {
 }
 
 const alwaystrue = () => true
-export function filterfn(source) {
+export function filterfn(source, argnames) {
     if (source === "") {
         return alwaystrue
     } 
     const fullsource = '"use strict";return !!(' + source + ')'
     try {
-        return Function("me", "selected", "pointed", "dist", "onpath", "$", fullsource)
+        return Function(...argnames, fullsource)
     } catch (e) {
         console.error("Error creating filter fn", e)
         return alwaystrue

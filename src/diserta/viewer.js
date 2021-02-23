@@ -50,6 +50,7 @@ export class PerspectiveView {
         this.parentElement = parentElement
         this.eventhandlers = new Map()
         this.filterfn = null
+        this.edgefilterfn = null
         this.mousepos = new THREE.Vector2()
         this.downpos = new THREE.Vector2(-1, -1)
         this.actorviews = new Map()
@@ -165,30 +166,45 @@ export class PerspectiveView {
         actorview.updateMatrix()
     }
 
+    isedgevisible(src, dst, edge, srcvisible, dstvisible) {
+        try {
+            return this.edgefilterfn ? this.edgefilterfn(src, dst, edge, srcvisible, dstvisible) : true
+        } catch (e) {
+            thloggler()("Exception while evaulating edge filter:", e) // TODO: output to screen
+            this.edgefilterfn=()=>true
+            return false
+        }
+    }
+
+    drawedge(src, dst, edgename) {
+        const srcactor = src.actor
+        const dstactor = dst.actor
+        const edgeid = srcactor.box + dstactor.box
+        let edge = this.edges.get(edgeid)
+        const points = [new THREE.Vector3(srcactor.x, srcactor.y, srcactor.z), new THREE.Vector3(dstactor.x, dstactor.y, dstactor.z)]
+        if (!edge) {
+            const geometry = new THREE.BufferGeometry().setFromPoints( points )
+            edge = new THREE.Line( geometry, new THREE.LineBasicMaterial( {
+                linewidth: 2,
+                 color: srcactor._monitorbox === dstactor._monitorbox ? INSCHEDULER_EDGE_COLOR : INTERSCHEDULER_EDGE_COLOR
+                }))
+            this.scene.add(edge)
+            this.edges.set(edgeid, edge)
+        } else {
+            edge.geometry = new THREE.BufferGeometry().setFromPoints( points )
+            edge.material.color.setHex(srcactor._monitorbox === dstactor._monitorbox ? INSCHEDULER_EDGE_COLOR : INTERSCHEDULER_EDGE_COLOR)
+        }
+        edge.visible = this.isedgevisible(src.actor, dst.actor, edgename, src.visible, dst.visible)
+    }
+
     redrawEdges() {
         const actors = this.actorviews
-        for (var source of this.actorviews.values()) {
-            if (!source.actor.extra) return
-            const box = source.actor.box
-            for (var val of Object.values(source.actor.extra)) {
-                const target = actors.get(val)
-                if (target) {
-                    const targetactor = target.actor
-                    let edge = this.edges.get(box + val)
-                    const points = [new THREE.Vector3(source.actor.x, source.actor.y, source.actor.z), new THREE.Vector3(targetactor.x, targetactor.y, targetactor.z)]
-                    if (!edge) {
-                        const geometry = new THREE.BufferGeometry().setFromPoints( points )
-                        edge = new THREE.Line( geometry, new THREE.LineBasicMaterial( {
-                            linewidth: 2,
-                             color: source.actor._monitorbox === target.actor._monitorbox ? INSCHEDULER_EDGE_COLOR : INTERSCHEDULER_EDGE_COLOR
-                            }))
-                        this.scene.add(edge)
-                        this.edges.set(box + val, edge)
-                    } else {
-                        edge.geometry = new THREE.BufferGeometry().setFromPoints( points )
-                        edge.material.color.setHex(source.actor._monitorbox === target.actor._monitorbox ? INSCHEDULER_EDGE_COLOR : INTERSCHEDULER_EDGE_COLOR)
-                    }
-                    edge.visible = source.visible && target.visible
+        for (var src of this.actorviews.values()) {
+            if (!src.actor.extra) return
+            for (const [edgename, val] of Object.entries(src.actor.extra)) {
+                const dst = actors.get(val)
+                if (dst) {
+                    this.drawedge(src, dst, edgename)
                 }
             }
         }
@@ -205,7 +221,7 @@ export class PerspectiveView {
     }
 
     redraw() {
-        if (this.parentElement.querySelector("#filter").showedges) {
+        if (this.parentElement.querySelector("#edgecontrol").showedges) {
             this.redrawEdges()
         } else {
             for (var edge of this.edges.values()) {
@@ -352,6 +368,10 @@ export class PerspectiveView {
 
     setfilter(filterfn) {
         this.filterfn = filterfn
+    }
+
+    setedgefilter(edgefilterfn) {
+        this.edgefilterfn = edgefilterfn
     }
 
     addEventListener(eventname, handlerfn) {

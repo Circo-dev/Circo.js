@@ -17,7 +17,7 @@ class Watch extends Component {
     return css`
       .maincontainer {
         position: absolute;
-        top: 90px;
+        top: 98px;
         left: 10px;
         padding: 5px;
         font-family: "Gill Sans", sans-serif;
