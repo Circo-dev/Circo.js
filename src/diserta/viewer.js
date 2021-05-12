@@ -22,14 +22,14 @@ const projections = {
         rotation: { x: 0, y: 0, z: 0 }
     },
     nonimportant: {
-        geometry: new THREE.Geometry(),
+        geometry: new THREE.BoxBufferGeometry(1, 1, 1),
     }
 }
 
 const actortypes = new Map()
 
 export function registerActor(typeName, descriptor) {
-    if (descriptor instanceof THREE.BufferGeometry || descriptor instanceof THREE.Geometry) {
+    if (descriptor instanceof THREE.BufferGeometry) {
         descriptor = {
             geometry: descriptor
         }
