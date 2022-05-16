@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-only
-import msgpack from "../../web_modules/@ygoe/msgpack/msgpack.js"
+import msgpack from "https://cdn.skypack.dev/@ygoe/msgpack?min"
 
 const typeregistry = new Map()
 const registeroptions = Symbol()

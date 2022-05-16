@@ -9,8 +9,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "npx pika-web --clean --optimize",
-    "serve": "npx ws"
+    "serve": "npx ws -p 4242"
   },
   "repository": {
     "type": "git",
@@ -23,24 +22,6 @@
   },
   "homepage": "https://github.com/tisztamo/CircoCore.js#readme",
   "devDependencies": {
-    "@pika/web": "^0.6.1"
-  },
-  "dependencies": {
-    "@ygoe/msgpack": "github:tisztamo/msgpack.js",
-    "lit-element": "^2.4.0",
-    "local-web-server": "4.2.0",
-    "three": ">=0.125.0"
-  },
-  "@pika/web": {
-    "webDependencies": [
-      "lit-element",
-      "three/build/three.module.js",
-      "three/examples/jsm/controls/TrackballControls.js",
-      "three/examples/jsm/controls/OrbitControls.js",
-      "three/examples/jsm/postprocessing/OutlinePass.js",
-      "three/examples/jsm/postprocessing/RenderPass.js",
-      "three/examples/jsm/postprocessing/EffectComposer.js",
-      "@ygoe/msgpack/msgpack.js"
-    ]
+    "local-web-server": "4.2.0"
   }
 }

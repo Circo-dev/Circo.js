@@ -1,4 +1,4 @@
-import {LitElement} from "../../../web_modules/lit-element.js"
+import {LitElement} from "lit"
 
 export class Component extends LitElement {
   constructor() {

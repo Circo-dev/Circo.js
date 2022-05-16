@@ -1,5 +1,5 @@
 import {Component} from "./helpers/component.js"
-import {html, css} from "../../../../web_modules/lit-element.js"
+import {html, css} from "lit"
 
 class Status extends Component {
   static get properties() {

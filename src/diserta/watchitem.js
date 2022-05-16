@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 import {Component} from "./helpers/component.js"
-import {html, css} from "../../../../web_modules/lit-element.js"
+import {html, css} from "lit"
 import { registrationOptions } from "../core/msg.js"
 
 class WatchItem extends Component {

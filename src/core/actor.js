@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 import { ActorResponse } from "./token.js"
 
+
 export class Actor {
     constructor() {
         this.address = null // address and service will be set by the scheduler when scheduling
+        /** @type {import("./scheduler.js").ActorService} */
         this.service = null
     }
 

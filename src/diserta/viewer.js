@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import * as THREE from "../../web_modules/three/build/three.module.js"
-import { TrackballControls } from "../../web_modules/three/examples/jsm/controls/TrackballControls.js"
-import { OrbitControls } from "../../web_modules/three/examples/jsm/controls/OrbitControls.js"
-import { EffectComposer } from "../../web_modules/three/examples/jsm/postprocessing/EffectComposer.js"
-import { RenderPass } from "../../web_modules/three/examples/jsm/postprocessing/RenderPass.js"
-import { OutlinePass } from "../../web_modules/three/examples/jsm/postprocessing/OutlinePass.js"
+import * as THREE from "three"
+import { OrbitControls } from "three-orbitcontrols"
+import { TrackballControls } from "three-trackballcontrols"
+import { EffectComposer } from "three-effectcomposer"
+import { RenderPass } from "three-renderpass"
+import { OutlinePass } from "three-outlinepass"
 import { thloggler } from "../core/util.js"
 import { dist, onpath } from "./helpers/filterlib.js"
 import { getactor } from "./filter.js"
